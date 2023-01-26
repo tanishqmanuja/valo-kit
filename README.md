@@ -9,15 +9,27 @@
 
 > A turborepo for my valorant side project
 
-## Prerequisites
+## Prerequisites for Developers
 
 - node >=18.12
+- pnpm
 
 ## Install
 
 ```sh
 pnpm install
 ```
+
+## Projects in Monorepo
+
+### vRYjs
+
+It is a port/rewrite of the OG [VALORANT Rank Yoinker aka vRY](https://github.com/zayKenyon/VALORANT-rank-yoinker) which is originally written in python.
+
+Usage
+- Download vRYjs.exe from [Releases](https://github.com/tanishqmanuja/valo-kit/releases/)
+- Put in a separate folder because software generates temporary helper folder and files.
+- Run and Enjoy!
 
 ## Author
 
@@ -29,5 +41,12 @@ pnpm install
 
 Give a ⭐️ if this project helped you!
 
-***
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+## Infinite Thanks ❤️‍🔥
+
+- [VALORANT-rank-yoinker](https://github.com/zayKenyon/VALORANT-rank-yoinker)
+- [valorant-api-docs](https://github.com/techchrism/valorant-api-docs)
+
+## Disclaimer
+
+THIS PROJECT IS NOT ASSOCIATED OR ENDORSED BY RIOT GAMES. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
+Whilst effort has been made to abide by Riot's API rules; you acknowledge that use of this software is done so at your own risk.
