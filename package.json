@@ -26,7 +26,6 @@
   "author": "tanishqmanuja",
   "license": "MIT",
   "devDependencies": {
-    "@changesets/cli": "^2.26.0",
     "rimraf": "^3.0.2",
     "turbo": "^1.7.0"
   }
