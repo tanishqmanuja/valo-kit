@@ -1,0 +1,56 @@
+{
+  "name": "@valo-kit/vry-js",
+  "version": "0.3.0",
+  "private": true,
+  "description": "CLI for Valorant Match Info",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.cjs",
+    "dev": "node scripts/build.mjs --watch",
+    "lint": "tsc --noEmit",
+    "build": "pnpm build:prod",
+    "build:dev": "node scripts/build.mjs",
+    "build:prod": "node scripts/build.mjs --prod",
+    "package": "cross-env PKG_CACHE_PATH=.cache/pkg pkg dist/index.cjs -t node18-win-x64 -o bin/vRYjs.exe && pnpm postpackage",
+    "postpackage": "node scripts/post-package.mjs",
+    "clean": "rimraf bin dist .turbo .cache node_modules"
+  },
+  "keywords": [
+    "valorant"
+  ],
+  "author": "tanishqmanuja",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.1",
+    "@types/minimist": "^1.2.2",
+    "@types/node": "^18.11.18",
+    "@types/ws": "^8.5.4",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.0.3",
+    "esbuild": "^0.16.16",
+    "esbuild-plugin-version-injector": "^1.0.2",
+    "minimist": "^1.2.7",
+    "pkg": "^5.8.0",
+    "resedit": "^1.6.1",
+    "rimraf": "^3.0.2",
+    "tiny-glob": "^0.2.9",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@valo-kit/api-client": "workspace:*",
+    "chalk": "^5.2.0",
+    "cli-table3": "^0.6.3",
+    "execa": "^6.1.0",
+    "keypress": "^0.2.1",
+    "lowdb": "^5.0.5",
+    "ora": "^6.1.2",
+    "rxjs": "^7.8.0",
+    "ts-extras": "^0.11.0",
+    "type-fest": "^3.5.1",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1",
+    "ws": "^8.12.0",
+    "yaml": "^2.2.1",
+    "zod": "^3.20.2"
+  }
+}

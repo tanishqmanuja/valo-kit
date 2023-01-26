@@ -1,0 +1,37 @@
+{
+  "name": "@valo-kit/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Api Client wrapper for Valorant",
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./types": "./dist/types.d.ts"
+  },
+  "scripts": {
+    "dev": "tsup src/index.ts --watch",
+    "build": "tsup",
+    "clean": "rimraf dist .turbo node_modules"
+  },
+  "keywords": [
+    "valorant"
+  ],
+  "author": "tanishqmanuja",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "rimraf": "^3.0.2",
+    "tsup": "^6.5.0",
+    "typescript": "5.0.0-dev.20230111"
+  },
+  "dependencies": {
+    "axios": "^1.2.2",
+    "axios-cache-interceptor": "^1.0.0",
+    "axios-logger": "^2.6.2",
+    "axios-rate-limit": "^1.3.0",
+    "dayjs": "^1.11.7",
+    "ts-extras": "^0.11.0"
+  }
+}

@@ -1,0 +1,19 @@
+# Dependencies
+node_modules
+
+# IDE
+.vscode
+
+# Cache
+.cache
+.turbo
+
+# Logs
+logs
+
+# Output
+bin
+dist
+
+# Env
+.env

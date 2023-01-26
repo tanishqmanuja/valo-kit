@@ -1,0 +1,33 @@
+{
+  "name": "valo-kit",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "build:api-client": "turbo --filter=api-client build",
+    "build:vry-js": "turbo --filter=vry-js build",
+    "dev": "turbo dev --parallel",
+    "clean": "turbo clean && rimraf node_modules",
+    "lint": "turbo lint",
+    "package": "turbo package"
+  },
+  "engines": {
+    "node": ">=18.12"
+  },
+  "packageManager": "pnpm@7.24.3",
+  "workspaces": [
+    "vry-js",
+    "api-client"
+  ],
+  "keywords": [
+    "valorant",
+    "vry"
+  ],
+  "author": "tanishqmanuja",
+  "license": "MIT",
+  "devDependencies": {
+    "@changesets/cli": "^2.26.0",
+    "rimraf": "^3.0.2",
+    "turbo": "^1.7.0"
+  }
+}

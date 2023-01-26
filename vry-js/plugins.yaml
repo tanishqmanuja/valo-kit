@@ -1,0 +1,12 @@
+plugins:
+  player-party: true
+  player-agent: true
+  player-name: true
+  player-weapons: [Odin]
+  player-rank: true
+  player-rr: true
+  player-peak-rank: true
+  player-winrate: true
+  player-level: true
+  team-spacer: true
+  sort-by-level: true
