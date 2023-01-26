@@ -3,6 +3,9 @@ name: Workspace
 on:
   push:
     branches: [main]
+    path:
+      - "api-client/**"
+      - "vry-js/**"
   pull_request:
     branches: [main]
 
