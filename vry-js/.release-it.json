@@ -9,7 +9,7 @@
     "releaseName": "v${version}",
     "tokenRef": "GITHUB_TOKEN",
     "assets": [
-      "./bin/vRYjs-*.apk"
+      "./bin/vRYjs-v${version}.apk"
     ]
   },
   "hooks": {
