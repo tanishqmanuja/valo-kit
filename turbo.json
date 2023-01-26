@@ -28,6 +28,7 @@
 			"outputs": [
 				"bin/**"
 			]
-		}
+		},
+		"release": {}
 	}
 }

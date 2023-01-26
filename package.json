@@ -9,7 +9,8 @@
     "dev": "turbo dev --parallel",
     "clean": "turbo clean && rimraf node_modules",
     "lint": "turbo lint",
-    "package": "turbo package"
+    "package": "turbo package",
+    "release:vry-js": "turbo --filter=vry-js release"
   },
   "engines": {
     "node": ">=18.12"

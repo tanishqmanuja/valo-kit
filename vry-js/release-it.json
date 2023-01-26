@@ -1,0 +1,43 @@
+{
+  "git": {
+    "tagName": "v${version}",
+    "commitMessage": "chore: release v${version}",
+    "pushRepo": "https://github.com/tanishqmanuja/valo-kit"
+  },
+  "github": {
+    "release": true,
+    "releaseName": "v${version}",
+    "tokenRef": "GITHUB_TOKEN",
+    "assets": [
+      "./bin/vRYjs-*.apk"
+    ]
+  },
+  "hooks": {
+    "after:bump": [
+      "pnpm build",
+      "pnpm package"
+    ],
+    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
+  },
+  "npm": {
+    "publish": false
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          {
+            "type": "feat",
+            "section": "Features"
+          },
+          {
+            "type": "fix",
+            "section": "Bug Fixes"
+          }
+        ]
+      },
+      "ignoreRecommendedBump": true
+    }
+  }
+}
