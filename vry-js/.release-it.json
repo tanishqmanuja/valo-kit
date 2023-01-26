@@ -6,7 +6,7 @@
   },
   "github": {
     "release": true,
-    "releaseName": "v${version}",
+    "releaseName": "vRYjs v${version}",
     "tokenRef": "GITHUB_TOKEN",
     "assets": [
       "bin/vRYjs-v${version}.exe"
