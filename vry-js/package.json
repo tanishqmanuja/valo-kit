@@ -13,7 +13,8 @@
     "build:prod": "node scripts/build.mjs --prod",
     "package": "cross-env PKG_CACHE_PATH=.cache/pkg pkg dist/index.cjs -t node18-win-x64 -o bin/vRYjs.exe && pnpm postpackage",
     "postpackage": "node scripts/post-package.mjs",
-    "clean": "rimraf bin dist .turbo .cache node_modules"
+    "clean": "rimraf bin dist .turbo .cache node_modules",
+    "release": "release-it --ci"
   },
   "keywords": [
     "valorant"

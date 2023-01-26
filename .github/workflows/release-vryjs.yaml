@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Install dependencies
+      - name: Release
         run: pnpm release:vry-js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
