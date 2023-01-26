@@ -9,8 +9,10 @@ import {
 	OnStatePreGame,
 	TablePlugin,
 } from "../table/plugin.js";
+import { isStreamerModeEnabled } from "../utils/env.js";
 
 const COLUMN_HEADER = "Name";
+const STREAMER_MODE = isStreamerModeEnabled();
 
 export default class PlayerNamePlugin
 	extends TablePlugin
@@ -51,6 +53,10 @@ export default class PlayerNamePlugin
 				return chalk.rgb(221, 224, 41)(name);
 			}
 
+			if (player.PlayerIdentity.Incognito && STREAMER_MODE) {
+				return chalk.gray("Hidden");
+			}
+
 			return chalk.rgb(76, 151, 237)(name);
 		});
 
@@ -75,6 +81,10 @@ export default class PlayerNamePlugin
 
 			if (myPartyplayers.some(p => p.puuid === player.Subject)) {
 				return chalk.rgb(221, 224, 41)(name);
+			}
+
+			if (player.PlayerIdentity.Incognito && STREAMER_MODE) {
+				return chalk.gray("Hidden");
 			}
 
 			if (isRed) {

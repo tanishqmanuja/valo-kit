@@ -18,7 +18,10 @@ const config = {
 		".js": ".cjs",
 	},
 	platform: "node",
-	define: { "process.env.NODE_ENV": isProd ? `"production"` : `"development"` },
+	define: {
+		"process.env.NODE_ENV": isProd ? `"production"` : `"development"`,
+		"process.env.STREAMER_MODE": isProd ? `true` : `false`,
+	},
 	sourcemap: !isProd,
 	minify: isProd,
 	plugins: [esbuildPluginVersionInjector()],

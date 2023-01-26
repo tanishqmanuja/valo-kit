@@ -20,12 +20,11 @@ import {
 	timer,
 } from "rxjs";
 import { ErrorHandler } from "./error/error-handler.js";
-import { waitForLogin } from "./helpers/api.js";
 import { logStartingBanner, printStartingBanner } from "./helpers/banner.js";
 import { fetchEssentialContent } from "./helpers/content.js";
 import { enableHotkeyDetector } from "./helpers/hotkeys.js";
 import { getTableHeader } from "./helpers/table.js";
-import { waitForValorant } from "./helpers/valorant.js";
+import { waitForLogin } from "./helpers/valorant.js";
 import { apiLogger, getModuleLogger } from "./logger/logger.js";
 import { MessagesService } from "./services/messages.js";
 import { PresencesService } from "./services/presences.js";
@@ -46,7 +45,6 @@ const errorHandler = new ErrorHandler(logger);
 const api = new ApiClient(apiLogger);
 
 const main = async () => {
-	await waitForValorant();
 	await waitForLogin(api);
 
 	const webSocketService = new WebSocketService(api);
