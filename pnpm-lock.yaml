@@ -47,6 +47,7 @@ importers:
       cli-table3: ^0.6.3
       cross-env: ^7.0.3
       dotenv: ^16.0.3
+      dotenv-cli: ^7.0.0
       esbuild: ^0.16.16
       esbuild-plugin-version-injector: ^1.0.2
       execa: ^6.1.0
@@ -92,6 +93,7 @@ importers:
       '@types/ws': 8.5.4
       cross-env: 7.0.3
       dotenv: 16.0.3
+      dotenv-cli: 7.0.0
       esbuild: 0.16.16
       esbuild-plugin-version-injector: 1.0.2
       minimist: 1.2.7
@@ -1531,6 +1533,21 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       is-obj: 2.0.0
+    dev: true
+
+  /dotenv-cli/7.0.0:
+    resolution: {integrity: sha512-XfMzVdpdDTRnlcgvFLg3lSyiLXqFxS4tH7RbK5IxkC4XIUuxPyrGoDufkfLjy/dA28EILzEu+mros6h8aQmyGg==}
+    hasBin: true
+    dependencies:
+      cross-spawn: 7.0.3
+      dotenv: 16.0.3
+      dotenv-expand: 10.0.0
+      minimist: 1.2.7
+    dev: true
+
+  /dotenv-expand/10.0.0:
+    resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
+    engines: {node: '>=12'}
     dev: true
 
   /dotenv/16.0.3:

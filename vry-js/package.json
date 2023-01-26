@@ -14,7 +14,8 @@
     "package": "cross-env PKG_CACHE_PATH=.cache/pkg pkg dist/index.cjs -t node18-win-x64 -o bin/vRYjs.exe && pnpm postpackage",
     "postpackage": "node scripts/post-package.mjs",
     "clean": "rimraf bin dist .turbo .cache node_modules",
-    "release": "release-it --ci"
+    "release": "dotenv release-it --",
+    "release:ci": "release-it --ci"
   },
   "keywords": [
     "valorant"
@@ -29,6 +30,7 @@
     "@types/ws": "^8.5.4",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
+    "dotenv-cli": "^7.0.0",
     "esbuild": "^0.16.16",
     "esbuild-plugin-version-injector": "^1.0.2",
     "minimist": "^1.2.7",

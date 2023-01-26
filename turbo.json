@@ -29,6 +29,6 @@
 				"bin/**"
 			]
 		},
-		"release": {}
+		"release:ci": {}
 	}
 }

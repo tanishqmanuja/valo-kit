@@ -10,7 +10,7 @@
     "clean": "turbo clean && rimraf node_modules",
     "lint": "turbo lint",
     "package": "turbo package",
-    "release:vry-js": "turbo --filter=vry-js release"
+    "release:ci:vry-js": "turbo --filter=vry-js release:ci"
   },
   "engines": {
     "node": ">=18.12"
