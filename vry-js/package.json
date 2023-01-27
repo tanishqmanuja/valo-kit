@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node dist/index.cjs",
+    "start:dev": "pnpm build:dev && pnpm start",
     "dev": "node scripts/build.mjs --watch",
     "lint": "tsc --noEmit",
     "build": "pnpm build:prod",
