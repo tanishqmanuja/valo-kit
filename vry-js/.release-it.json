@@ -39,6 +39,11 @@
             "type": "fix",
             "scope": "vry",
             "section": "Bug Fixes 🐛"
+          },
+          {
+            "type": "misc",
+            "scope": "vry",
+            "section": "Miscellaneous 🦾"
           }
         ]
       },
