@@ -32,11 +32,13 @@
         "types": [
           {
             "type": "feat",
-            "section": "Features"
+            "scope": "vry",
+            "section": "Features 🎉"
           },
           {
             "type": "fix",
-            "section": "Bug Fixes"
+            "scope": "vry",
+            "section": "Bug Fixes 🐛"
           }
         ]
       },
