@@ -93,6 +93,7 @@ const main = async () => {
 				tableSpinner.start("Fetching PreGame Data...");
 				const fetchUpdatedAgents = previousGameState === "PREGAME";
 
+				tableSpinner.start("Getting Match Id...");
 				const matchId = await messagesService.getPreGameMatchId();
 
 				matchData = await api.core.getPreGameMatchData(
@@ -109,6 +110,7 @@ const main = async () => {
 			if (gameState === "INGAME") {
 				tableSpinner.start("Fetching CoreGame Data...");
 
+				tableSpinner.start("Getting Match Id...");
 				const matchId = await messagesService.getCoreGameMatchId();
 
 				matchData = await api.core.getCoreGameMatchData(matchId);
