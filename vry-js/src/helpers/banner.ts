@@ -3,6 +3,12 @@ import { rawLogger } from "../logger/logger.js";
 import { isDevelopment } from "../utils/env.js";
 import { version as vr } from "../utils/version.js";
 
+export const setTitle = () => {
+	process.title = `VALORANT Rank Yoinker JS v${vr}${
+		isDevelopment() ? "-Dev" : ""
+	}`;
+};
+
 export const logStartingBanner = () => {
 	rawLogger.info("");
 	rawLogger.info("********************************************************");

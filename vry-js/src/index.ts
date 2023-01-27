@@ -20,7 +20,11 @@ import {
 	timer,
 } from "rxjs";
 import { ErrorHandler } from "./error/error-handler.js";
-import { logStartingBanner, printStartingBanner } from "./helpers/banner.js";
+import {
+	logStartingBanner,
+	printStartingBanner,
+	setTitle,
+} from "./helpers/banner.js";
 import { fetchEssentialContent } from "./helpers/content.js";
 import { enableHotkeyDetector } from "./helpers/hotkeys.js";
 import { getTableHeader } from "./helpers/table.js";
@@ -35,6 +39,7 @@ import { isDevelopment, isPackaged } from "./utils/env.js";
 
 const userTableRefreshRequest$ = new BehaviorSubject(true);
 
+setTitle();
 printStartingBanner();
 logStartingBanner();
 
