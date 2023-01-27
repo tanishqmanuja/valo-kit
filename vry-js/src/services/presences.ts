@@ -1,18 +1,22 @@
 import {
 	BehaviorSubject,
 	combineLatest,
+	defer,
 	distinctUntilChanged,
 	filter,
 	firstValueFrom,
 	from,
+	interval,
 	map,
 	merge,
 	mergeMap,
 	retry,
 	scan,
+	switchMap,
 	take,
 	tap,
 	timer,
+	withLatestFrom,
 } from "rxjs";
 
 import type { ApiClient } from "@valo-kit/api-client";
@@ -70,11 +74,11 @@ export class PresencesService {
 		private webSocketService: WebSocketService
 	) {
 		this.webSocketService.enableListenerForEvent(WS_EVENT_PRESENCES);
-		from(api.core.getPresences())
+		defer(() => from(api.core.getPresences()))
 			.pipe(
-				take(1),
 				tap(p => this.presences$.next(p)),
-				retry({ count: 5, delay: 2000 })
+				retry({ count: 5, delay: 2000 }),
+				take(1)
 			)
 			.subscribe();
 
@@ -105,19 +109,29 @@ export class PresencesService {
 	}
 
 	async waitForPresencesOf(playersUUIDs: string[], timeout = 5000) {
-		return Promise.any([
-			firstValueFrom(
-				this.collectedPresences$.pipe(
-					filter(presences =>
-						playersUUIDs.every(puuid =>
-							presences.find(presence => presence.puuid === puuid)
-						)
-					)
+		const presencesApi$ = defer(() =>
+			from(this.api.core.getPresences()).pipe(retry({ delay: 2000 }))
+		);
+
+		const presencesUpdater$ = interval(2000).pipe(
+			switchMap(() => presencesApi$),
+			tap(p => this.presences$.next(p))
+		);
+
+		const collectedPresences$ = this.collectedPresences$.pipe(
+			withLatestFrom(presencesUpdater$, (p, _) => p),
+			filter(presences =>
+				playersUUIDs.every(puuid =>
+					presences.find(presence => presence.puuid === puuid)
 				)
-			),
-			firstValueFrom(
-				timer(timeout).pipe(mergeMap(_ => this.collectedPresences$))
-			),
-		]);
+			)
+		);
+
+		return firstValueFrom(
+			merge(
+				collectedPresences$,
+				timer(timeout).pipe(mergeMap(() => this.collectedPresences$))
+			)
+		);
 	}
 }

@@ -1,11 +1,14 @@
 import { ApiClient } from "@valo-kit/api-client";
 import {
+	defer,
 	distinctUntilChanged,
 	filter,
 	firstValueFrom,
+	from,
 	map,
 	merge,
 	ReplaySubject,
+	retry,
 	tap,
 } from "rxjs";
 
@@ -53,26 +56,28 @@ export class MessagesService {
 	}
 
 	async getPreGameMatchId() {
-		return Promise.any([
-			firstValueFrom(
-				this.matchId$.pipe(
-					filter(ev => ev.service === "pregame"),
-					map(ev => ev.id)
-				)
-			),
-			this.api.core.getPreGameMatchId(),
-		]);
+		const matchIdWs$ = this.matchId$.pipe(
+			filter(ev => ev.service === "pregame"),
+			map(ev => ev.id)
+		);
+		const matchIdApi$ = defer(() =>
+			from(this.api.core.getPreGameMatchId()).pipe(retry({ delay: 2000 }))
+		);
+		const matchId$ = merge(matchIdWs$, matchIdApi$).pipe(filter(Boolean));
+
+		return firstValueFrom(matchId$);
 	}
 
 	async getCoreGameMatchId() {
-		return Promise.any([
-			firstValueFrom(
-				this.matchId$.pipe(
-					filter(ev => ev.service === "core-game"),
-					map(ev => ev.id)
-				)
-			),
-			this.api.core.getCoreGameMatchId(),
-		]);
+		const matchIdWs$ = this.matchId$.pipe(
+			filter(ev => ev.service === "core-game"),
+			map(ev => ev.id)
+		);
+		const matchIdApi$ = defer(() =>
+			from(this.api.core.getCoreGameMatchId()).pipe(retry({ delay: 2000 }))
+		);
+		const matchId$ = merge(matchIdWs$, matchIdApi$).pipe(filter(Boolean));
+
+		return firstValueFrom(matchId$);
 	}
 }
