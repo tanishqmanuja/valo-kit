@@ -77,7 +77,7 @@ export default class PlayerWeaponsPlugin
 
 	private logger = this.table.getPluginLogger(this);
 
-	private preferedWeapon = "Vandal";
+	private preferredWeapon = "Vandal";
 
 	constructor(table: Table, flags?: string[]) {
 		super(table, flags);
@@ -85,7 +85,7 @@ export default class PlayerWeaponsPlugin
 		if (this.flags.length) {
 			const [prefWeapon] = this.flags;
 			if (weaponsList.includes(prefWeapon.toLowerCase() as WeaponName)) {
-				this.preferedWeapon = prefWeapon;
+				this.preferredWeapon = prefWeapon;
 			} else {
 				this.logger.warn("Invalid prefered weapon in config");
 			}
@@ -104,8 +104,8 @@ export default class PlayerWeaponsPlugin
 			this.getMappedLoadout(l)
 		).map(loudout => {
 			const skin =
-				loudout[this.preferedWeapon.toLowerCase() as WeaponName].skin;
-			const name = skin.displayName.replace(this.preferedWeapon, "");
+				loudout[this.preferredWeapon.toLowerCase() as WeaponName].skin;
+			const name = skin.displayName.replace(this.preferredWeapon, "");
 			const colorRGB = getSkinColorFromTier(skin.contentTierUuid!);
 			if (name.toLowerCase() === "standard") {
 				return chalk.gray(name);
@@ -114,7 +114,7 @@ export default class PlayerWeaponsPlugin
 		});
 
 		if (skins) {
-			return this.table.addColumn(this.preferedWeapon, skins);
+			return this.table.addColumn(this.preferredWeapon, skins);
 		}
 	}
 
@@ -126,8 +126,8 @@ export default class PlayerWeaponsPlugin
 			this.getMappedLoadout(l.Loadout)
 		).map(loudout => {
 			const skin =
-				loudout[this.preferedWeapon.toLowerCase() as WeaponName].skin;
-			const name = skin.displayName.replace(this.preferedWeapon, "").trim();
+				loudout[this.preferredWeapon.toLowerCase() as WeaponName].skin;
+			const name = skin.displayName.replace(this.preferredWeapon, "").trim();
 			const colorRGB = getSkinColorFromTier(skin.contentTierUuid!);
 			if (name.toLowerCase() === "standard") {
 				return chalk.gray(name);
@@ -136,7 +136,7 @@ export default class PlayerWeaponsPlugin
 		});
 
 		if (skins) {
-			return this.table.addColumn(this.preferedWeapon, skins);
+			return this.table.addColumn(this.preferredWeapon, skins);
 		}
 	}
 
