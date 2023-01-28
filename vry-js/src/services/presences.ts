@@ -32,8 +32,8 @@ export class PresencesService {
 		filter(presences => presences.some(it => it.puuid === this.api.self.puuid)),
 		map(presences => this.api.helpers.getSelfPresence(presences))
 	);
+
 	gameState$ = this.selfPresence$.pipe(
-		// debounceTime(1000),
 		map(presence => this.api.helpers.getGameState([presence]))
 	);
 
@@ -74,13 +74,14 @@ export class PresencesService {
 		private webSocketService: WebSocketService
 	) {
 		this.webSocketService.enableListenerForEvent(WS_EVENT_PRESENCES);
-		defer(() => from(api.core.getPresences()))
-			.pipe(
-				tap(p => this.presences$.next(p)),
-				retry({ count: 5, delay: 2000 }),
-				take(1)
-			)
-			.subscribe();
+
+		const updatePresencesThroughApiOnce$ = defer(() =>
+			from(api.core.getPresences())
+		).pipe(
+			tap(p => this.presences$.next(p)),
+			retry({ count: 5, delay: 2000 }),
+			take(1)
+		);
 
 		const presencesUpdater$ = this.webSocketService.webSocketEvents$.pipe(
 			filter(
@@ -93,7 +94,7 @@ export class PresencesService {
 			tap(presences => this.presences$.next(presences))
 		);
 
-		merge(presencesUpdater$).subscribe();
+		merge(updatePresencesThroughApiOnce$, presencesUpdater$).subscribe();
 	}
 
 	async getGameState() {
@@ -105,7 +106,10 @@ export class PresencesService {
 	}
 
 	async getPresencesWithSelfPresence() {
-		return [...this.presences$.value, await firstValueFrom(this.selfPresence$)];
+		return this.api.helpers.mergePresences(
+			await firstValueFrom(this.collectedPresences$),
+			[await firstValueFrom(this.selfPresence$)]
+		);
 	}
 
 	async waitForPresencesOf(playersUUIDs: string[], timeout = 5000) {

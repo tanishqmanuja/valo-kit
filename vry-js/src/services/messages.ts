@@ -30,7 +30,7 @@ export class MessagesService {
 	) {
 		this.webSocketService.enableListenerForEvent(WS_EVENT_MESSAGES);
 
-		const matchId$ = this.webSocketService.webSocketEvents$.pipe(
+		const matchIdUpdater$ = this.webSocketService.webSocketEvents$.pipe(
 			filter(res => res.event === WS_EVENT_MESSAGES && res.data.data),
 			filter(
 				res =>
@@ -52,7 +52,7 @@ export class MessagesService {
 			tap(matchIdEvent => this.matchId$.next(matchIdEvent))
 		);
 
-		merge(matchId$).subscribe();
+		merge(matchIdUpdater$).subscribe();
 	}
 
 	async getPreGameMatchId() {

@@ -89,7 +89,8 @@ const main = async () => {
 			tableSpinner.start("Renewing Self Presence...");
 		}),
 		switchMap(async ([previousGameState, gameState]) => {
-			let presences: Presences = [await presencesService.getSelfPresence()];
+			let presences: Presences =
+				await presencesService.getPresencesWithSelfPresence();
 
 			let matchData: PreGameMatchData | CoreGameMatchData | undefined;
 			let matchLoadouts;
