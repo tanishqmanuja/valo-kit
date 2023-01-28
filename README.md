@@ -1,42 +1,118 @@
-<h1 align="center">Welcome to Valo-Kit 👋</h1>
-<p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000" />
-  <img src="https://img.shields.io/badge/node-%3E%3D18.12-blue.svg" />
-  <a href="#" target="_blank">
-    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
-  </a>
-  <img src="https://img.shields.io/github/downloads/tanishqmanuja/valo-kit/total.svg" />
-</p>
+<h1 align="center">Valo-Kit</h1>
 
-> A turborepo for my valorant side project
+![GitHub Workflow Status][build-status-shield]
+[![Downloads][downloads-shield]][downloads-url]
+[![Language][language-shield]][language-url]
+[![License][license-shield]][license-url]
 
-## Prerequisites for Developers
+[build-status-shield]: https://img.shields.io/github/actions/workflow/status/tanishqmanuja/valo-kit/workspace.yaml?branch=main&style=for-the-badge
 
-- node >=18.12
-- pnpm
+[downloads-shield]: https://img.shields.io/github/downloads/tanishqmanuja/valo-kit/total?style=for-the-badge&logo=github
+[downloads-url]: https://github.com/tanishqmanuja/valo-kit/releases/latest
 
-## Install
+[language-shield]: https://img.shields.io/github/languages/top/tanishqmanuja/valo-kit?style=for-the-badge
+[language-url]: https://www.typescriptlang.org/
 
-```sh
-pnpm install
+[license-shield]: https://img.shields.io/github/license/tanishqmanuja/valo-kit?style=for-the-badge
+[license-url]: https://github.com/tanishqmanuja/valo-kit/blob/main/LICENSE.md
+
+A monorepo build using pnpm and turborepo, which encapsulates multiple interdependent projects for valorant.
+
+## Contents
+1. [vRYjs](#vryjs)
+2. [Api Client](#api-client)
+3. [Acknowledgements](#infinite-thanks-%EF%B8%8F)
+4. [Disclaimer](#disclaimer)
+
+## vRYjs
+
+This is port/rewrite of the OG project [VALORANT Rank Yoinker](https://github.com/zayKenyon/VALORANT-rank-yoinker) which is originally written in python.
+
+### Usage for Noobs (Basic)
+1. Download vRYjs.exe from [releases](https://github.com/tanishqmanuja/valo-kit/releases/)
+2. Put in a separate folder because software generates temporary helper folder and files.
+3. Run and Enjoy!
+
+### Usage for Techies (Intermediate)
+1. All steps from `Usage for Noobs`
+2. Download file `plugins.yaml` from [here](https://github.com/tanishqmanuja/valo-kit/blob/main/vry-js/plugins.yaml)
+3. Place `plugins.yaml` in the same folder as vRYjs.exe
+4. Use your creativity to customize the file using the guide below.
+```yaml
+# Disable a plugin
+# Example: sort-by-level: false
+
+plugin-name: false
+
+# Enable a plugin
+# Example: team-spacer: true
+plugin-name: true
+
+# Enable a plugin with flags
+# Example: player-weapons: [Odin]
+
+# if plugin supports single flag
+plugin-name: [flag]
+# if plugin supports multiple flags
+plugin-name: [flag1, flag2, flag3]
 ```
 
-## Projects in Monorepo
+### Usage for Gods (Advance)
+Prerequisites
+- node >=18.12
 
-### vRYjs
+Running from source
+1. Clone the repo
 
-It is a port/rewrite of the OG [VALORANT Rank Yoinker aka vRY](https://github.com/zayKenyon/VALORANT-rank-yoinker) which is originally written in python.
+```shell
+git clone https://github.com/tanishqmanuja/valo-kit.git
+```
 
-Usage
-- Download vRYjs.exe from [Releases](https://github.com/tanishqmanuja/valo-kit/releases/)
-- Put in a separate folder because software generates temporary helper folder and files.
-- Run and Enjoy!
+2. Cd to the cloned repo folder
 
-## Author
+```shell
+cd valo-kit
+```
 
-👤 **Tanishq Manuja**
+3. Enable pnpm if not yet enabled
 
-* Github: [@tanishqmanuja](https://github.com/tanishqmanuja)
+```shell
+corepack enable
+corepack prepare pnpm@latest --activate
+```
+
+4. Install Dependencies
+
+```shell
+pnpm i
+```
+
+5. Start vRYjs
+
+```shell
+pnpm start:vry-js
+```
+
+6. Package vRYjs (optional)
+
+Do this if you want to make your own executable file
+
+```shell
+pnpm package
+```
+> The file will be located at __./vry-js/bin/vRYjs-{version}.exe__
+
+### Notes
+1. AntiVirus Programs\
+Some antivirus vendors mark .exe file generated using `@vercel/pkg` as trojan. This is a false positive.
+Still if you dont trust the executable provided in release, you can build your own or run from the source.
+
+Reference Issues:
+- https://github.com/vercel/pkg/issues/1540
+
+## Api Client
+
+A helper library built to provide authentication and http requests support for remote/local valorant api.
 
 ## Show your support
 
