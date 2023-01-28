@@ -18,7 +18,7 @@ export const rankColorLUT: Record<string, RGBTuple> = {
 };
 
 export const shortRankReplacementMap: Record<string, string> = {
-	Unranked: "URnk",
+	Unranked: "Urnk",
 	Iron: "Iron",
 	Bronze: "Brnz",
 	Silver: "Slvr",
