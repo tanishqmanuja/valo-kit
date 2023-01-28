@@ -3,9 +3,9 @@ plugins:
   player-agent: true
   player-name: true
   player-weapons: [Odin]
-  player-rank: true
+  player-rank: [full]
   player-rr: true
-  player-peak-rank: true
+  player-peak-rank: [short]
   player-winrate: true
   player-level: true
   team-spacer: true

@@ -2,7 +2,8 @@ import {
 	CoreGameMatchData,
 	PreGameMatchData,
 } from "@valo-kit/api-client/types";
-import { colorizeRank } from "../formatters/rank.js";
+import { formatRank, RankFormattingStyle } from "../formatters/rank.js";
+import type { Table } from "../table/interfaces.js";
 import {
 	OnStateInGame,
 	OnStateMenus,
@@ -18,6 +19,24 @@ export default class PlayerPeakRankPlugin
 {
 	static id = "player-peak-rank";
 	name = "Player Peak Rank";
+
+	private logger = this.table.getPluginLogger(this);
+
+	private preferredFormattingStyle: RankFormattingStyle = "full";
+
+	constructor(table: Table, flags?: string[]) {
+		super(table, flags);
+
+		if (this.flags.length) {
+			const [style] = this.flags;
+			if (["full", "short", "tiny"].includes(style.toLowerCase())) {
+				this.preferredFormattingStyle =
+					style.toLowerCase() as RankFormattingStyle;
+			} else {
+				this.logger.warn("Invalid prefered style in config");
+			}
+		}
+	}
 
 	async onStateMenus() {
 		const { api, presences } = this.table.context;
@@ -75,7 +94,7 @@ export default class PlayerPeakRankPlugin
 		SeasonID?: string;
 	}) {
 		if (!Rank || !SeasonID) {
-			return colorizeRank("Unranked");
+			return formatRank("Unranked", this.preferredFormattingStyle);
 		}
 
 		const { api, competitiveTiers, content } = this.table.context;
@@ -87,7 +106,7 @@ export default class PlayerPeakRankPlugin
 
 		if (!actName || !episodeName || !episodeId) {
 			const rank = api.helpers.getRankName(Rank, latestCompetitiveTiers);
-			return colorizeRank(rank);
+			return formatRank(rank, this.preferredFormattingStyle);
 		}
 
 		const episodeNum = episodeName.split(" ")[1];
@@ -100,11 +119,14 @@ export default class PlayerPeakRankPlugin
 
 		if (!episodeCompetitiveTiers) {
 			const rank = api.helpers.getRankName(Rank, latestCompetitiveTiers);
-			return colorizeRank(rank);
+			return formatRank(rank, this.preferredFormattingStyle);
 		}
 
 		const rank = api.helpers.getRankName(Rank, episodeCompetitiveTiers);
 
-		return `${colorizeRank(rank)} (E${episodeNum}A${actNum})`;
+		return `${formatRank(
+			rank,
+			this.preferredFormattingStyle
+		)} (E${episodeNum}A${actNum})`;
 	}
 }

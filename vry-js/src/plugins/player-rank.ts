@@ -2,7 +2,8 @@ import {
 	CoreGameMatchData,
 	PreGameMatchData,
 } from "@valo-kit/api-client/types";
-import { colorizeRank } from "../formatters/rank.js";
+import { formatRank, RankFormattingStyle } from "../formatters/rank.js";
+import type { Table } from "../table/interfaces.js";
 import {
 	OnStateInGame,
 	OnStateMenus,
@@ -18,6 +19,24 @@ export default class PlayerRankPlugin
 {
 	static id = "player-rank";
 	name = "Player Rank";
+
+	private logger = this.table.getPluginLogger(this);
+
+	private preferredFormattingStyle: RankFormattingStyle = "full";
+
+	constructor(table: Table, flags?: string[]) {
+		super(table, flags);
+
+		if (this.flags.length) {
+			const [style] = this.flags;
+			if (["full", "short", "tiny"].includes(style.toLowerCase())) {
+				this.preferredFormattingStyle =
+					style.toLowerCase() as RankFormattingStyle;
+			} else {
+				this.logger.warn("Invalid prefered style in config");
+			}
+		}
+	}
 
 	async onStateMenus() {
 		const { api, presences, content, competitiveTiers } = this.table.context;
@@ -36,7 +55,7 @@ export default class PlayerRankPlugin
 			const mmr = playersMMR.find(mmr => mmr.Subject === player.puuid);
 			const tier = api.helpers.getCompetitiveTier(mmr!, currentSeason);
 			const rank = api.helpers.getRankName(tier.Rank, latestCompetitiveTiers);
-			return colorizeRank(rank);
+			return formatRank(rank, this.preferredFormattingStyle);
 		});
 		return this.table.addColumn(COLUMN_HEADER, ranks);
 	}
@@ -58,7 +77,7 @@ export default class PlayerRankPlugin
 			const mmr = playersMMR.find(mmr => mmr.Subject === player.Subject);
 			const tier = api.helpers.getCompetitiveTier(mmr!, currentSeason);
 			const rank = api.helpers.getRankName(tier.Rank, latestCompetitiveTiers);
-			return colorizeRank(rank);
+			return formatRank(rank, this.preferredFormattingStyle);
 		});
 		return this.table.addColumn(COLUMN_HEADER, ranks);
 	}
@@ -80,7 +99,7 @@ export default class PlayerRankPlugin
 			const mmr = playersMMR.find(mmr => mmr.Subject === player.Subject);
 			const tier = api.helpers.getCompetitiveTier(mmr!, currentSeason);
 			const rank = api.helpers.getRankName(tier.Rank, latestCompetitiveTiers);
-			return colorizeRank(rank);
+			return formatRank(rank, this.preferredFormattingStyle);
 		});
 		return this.table.addColumn(COLUMN_HEADER, ranks);
 	}
