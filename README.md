@@ -28,6 +28,9 @@ A monorepo build using pnpm and turborepo, which encapsulates multiple interdepe
 
 This is port/rewrite of the OG project [VALORANT Rank Yoinker](https://github.com/zayKenyon/VALORANT-rank-yoinker) which is originally written in python.
 
+### Preview
+![vRYjs Table](https://raw.github.com/tanishqmanuja/valo-kit/main/assets/vRYjsTable.png)
+
 ### Usage for Noobs (Basic)
 1. Download vRYjs.exe from [releases](https://github.com/tanishqmanuja/valo-kit/releases/)
 2. Put in a separate folder because software generates temporary helper folder and files.
