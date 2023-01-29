@@ -15,13 +15,13 @@ export type History = {
 	QueueID: string;
 };
 
-export type MatchDetailsResponse = {
+export type MatchDetails = {
 	matchInfo: MatchInfo;
 	players: Player[];
 	bots: any[];
 	coaches: any[];
 	teams: Team[];
-	roundResults: RoundResultElement[];
+	roundResults: RoundResult[];
 	kills: Kill[];
 };
 
@@ -168,7 +168,7 @@ export type AbilityCasts = {
 
 export type TeamID = "Red" | "Blue";
 
-export type RoundResultElement = {
+export type RoundResult = {
 	roundNum: number;
 	roundResult: RoundResultEnum;
 	roundCeremony: RoundCeremony;
