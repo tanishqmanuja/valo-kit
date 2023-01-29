@@ -1,4 +1,5 @@
 import { PlayerIdentity } from "./player.js";
+import { PlatformInfo } from "./shared.js";
 
 export type MappedParty = {
 	partyNumber: number;
@@ -13,13 +14,6 @@ export type PartyResponse = {
 	Invites: null;
 	Requests: [];
 	PlatformInfo: PlatformInfo;
-};
-
-export type PlatformInfo = {
-	platformType: string;
-	platformOS: string;
-	platformOSVersion: string;
-	platformChipset: string;
 };
 
 export type PartyInfo = {

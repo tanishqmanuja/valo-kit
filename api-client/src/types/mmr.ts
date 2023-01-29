@@ -60,3 +60,26 @@ export type SeasonInfo = {
 	GamesNeededForRating: number;
 	TotalWinsNeededForRank: number;
 };
+
+export type CompetitiveUpdatesResponse = {
+	Version: number;
+	Subject: string;
+	Matches: Match[];
+};
+
+export type Match = {
+	MatchID: string;
+	MapID: string;
+	SeasonID: string;
+	MatchStartTime: number;
+	TierAfterUpdate: number;
+	TierBeforeUpdate: number;
+	RankedRatingAfterUpdate: number;
+	RankedRatingBeforeUpdate: number;
+	RankedRatingEarned: number;
+	RankedRatingPerformanceBonus: number;
+	CompetitiveMovement: CompetitiveMovement;
+	AFKPenalty: number;
+};
+
+export type CompetitiveMovement = "MOVEMENT_UNKNOWN";

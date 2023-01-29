@@ -9,8 +9,8 @@ export type PreGameLoadouts = {
 export type PreGameMatchData = {
 	ID: string;
 	Version: number;
-	Teams: Team[];
-	AllyTeam: Team;
+	Teams: PreGameTeam[];
+	AllyTeam: PreGameTeam;
 	EnemyTeam: null;
 	ObserverSubjects: any[];
 	MatchCoaches: any[];
@@ -39,7 +39,7 @@ export type PreGameMatchData = {
 	RosterMetadata: null;
 };
 
-export type Team = {
+export type PreGameTeam = {
 	TeamID: string;
 	Players: Player[];
 };

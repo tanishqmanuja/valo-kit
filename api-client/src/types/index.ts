@@ -11,6 +11,7 @@ export * from "./party.js";
 export * from "./player.js";
 export * from "./pregame.js";
 export * from "./presence.js";
+export * from "./shared.js";
 export * from "./tiers.js";
 export * from "./userinfo.js";
 export * from "./weapon.js";

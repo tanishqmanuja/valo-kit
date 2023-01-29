@@ -1,5 +1,8 @@
 import type { ApiClient } from "../api-client.js";
-import type { MatchHistoryResponse } from "../types/match.js";
+import type {
+	MatchDetailsResponse,
+	MatchHistoryResponse,
+} from "../types/match.js";
 
 export async function getMatchHistory(this: ApiClient, puuid: string) {
 	const { data: historyRes } = await this.fetch<MatchHistoryResponse>(
@@ -8,4 +11,13 @@ export async function getMatchHistory(this: ApiClient, puuid: string) {
 	);
 
 	return historyRes;
+}
+
+export async function getMatchDetails(this: ApiClient, matchId: string) {
+	const { data: matchDetails } = await this.fetch<MatchDetailsResponse>(
+		"pd",
+		`/match-details/v1/matches/${matchId}`
+	);
+
+	return matchDetails;
 }
