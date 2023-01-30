@@ -38,3 +38,33 @@ export function getKillDeathRatioForMatch(
 
 	return deaths > 0 ? kills / deaths : kills;
 }
+
+export function getPlayerResultForMatch(
+	matchDetails: MatchDetails,
+	puuid: string
+) {
+	const playerTeamId = matchDetails.players.find(
+		p => p.subject === puuid
+	)?.teamId;
+
+	if (!playerTeamId) {
+		throw new Error("Player Team Id not found");
+	}
+
+	const allyTeam = matchDetails.teams.find(
+		team => team.teamId === playerTeamId
+	);
+	const enemyTeam = matchDetails.teams.find(
+		team => team.teamId !== playerTeamId
+	);
+
+	if (!allyTeam || !enemyTeam) {
+		throw new Error("Ally team or Enemy Team not found");
+	}
+
+	if (allyTeam.won === enemyTeam.won) {
+		return "Draw";
+	} else {
+		return allyTeam.won ? "Win" : "Loss";
+	}
+}
