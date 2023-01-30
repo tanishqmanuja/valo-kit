@@ -1,7 +1,7 @@
-import { ApiClient } from "@valo-kit/api-client";
+import type { ApiClient } from "@valo-kit/api-client";
 import { objectKeys } from "ts-extras";
 import { pingCommandHandler } from "./ping.js";
-import { Command, CommandHandlerFn } from "./types.js";
+import type { Command, CommandHandlerFn } from "./types.js";
 
 const MSG_PREFIX = "[vRY]";
 
