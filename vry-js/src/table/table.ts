@@ -3,6 +3,7 @@ import CliTable from "cli-table3";
 import { getModuleLogger, getPluginLogger } from "../logger/logger.js";
 import PlayerAgentPlugin from "../plugins/player-agent.js";
 import PlayerLevelPlugin from "../plugins/player-level.js";
+import PlayerMatchesPlugin from "../plugins/player-matches.js";
 import PlayerNamePlugin from "../plugins/player-name.js";
 import PlayerPartyPlugin from "../plugins/player-party.js";
 import PlayerPeakRankPlugin from "../plugins/player-peak-rank.js";
@@ -28,6 +29,7 @@ const pluginCtors = [
 	PlayerPeakRankPlugin,
 	PlayerWinRatePlugin,
 	PlayerLevelPlugin,
+	PlayerMatchesPlugin,
 	TeamSpacerPlugin,
 	SortByLevelPlugin,
 ];
