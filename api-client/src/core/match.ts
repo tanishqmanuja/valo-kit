@@ -13,7 +13,12 @@ export async function getMatchHistory(this: ApiClient, puuid: string) {
 export async function getMatchDetails(this: ApiClient, matchId: string) {
 	const { data: matchDetails } = await this.fetch<MatchDetails>(
 		"pd",
-		`/match-details/v1/matches/${matchId}`
+		`/match-details/v1/matches/${matchId}`,
+		{
+			cache: {
+				ttl: Infinity,
+			},
+		}
 	);
 
 	return matchDetails;

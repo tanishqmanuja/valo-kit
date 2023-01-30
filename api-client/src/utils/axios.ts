@@ -11,7 +11,8 @@ import { Agent } from "https";
 import { ApiClient } from "../api-client.js";
 
 const MAX_RPS = 6;
-const CACHE_TTL_MINS = 15;
+const VAL_CACHE_TTL_MINS = 2;
+const EXTERNAL_CACHE_TTL_MINS = 15;
 const RETRY_LIMIT = 2;
 const RETRY_DELAY_MS = 2 * 1000;
 
@@ -37,7 +38,7 @@ const fetchClientWithRate = (maxRPS: any) => {
 	});
 
 	const cachedClient = setupCache(httpClient as RateLimitedAxiosInstance, {
-		ttl: 1000 * 60 * 1,
+		ttl: 1000 * 60 * VAL_CACHE_TTL_MINS,
 	});
 
 	return cachedClient;
@@ -45,7 +46,7 @@ const fetchClientWithRate = (maxRPS: any) => {
 
 export const valorantAxios = fetchClientWithRate(MAX_RPS);
 export const externalAxios = setupCache(axios, {
-	ttl: 1000 * 60 * CACHE_TTL_MINS,
+	ttl: 1000 * 60 * EXTERNAL_CACHE_TTL_MINS,
 });
 
 export const injectValorantAutoRefreshToken = (
