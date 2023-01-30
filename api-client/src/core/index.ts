@@ -2,6 +2,7 @@ export * from "./chat.js";
 export * from "./content.js";
 export * from "./coregame.js";
 export * from "./entitlements.js";
+export * from "./match.js";
 export * from "./mmr.js";
 export * from "./party.js";
 export * from "./players.js";
