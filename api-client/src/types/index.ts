@@ -1,4 +1,5 @@
 export * from "./agent.js";
+export * from "./chat.js";
 export * from "./content.js";
 export * from "./coregame.js";
 export * from "./entitlements.js";
