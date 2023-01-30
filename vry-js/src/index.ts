@@ -42,6 +42,7 @@ import { WebSocketService } from "./services/websocket.js";
 import { Table } from "./table/table.js";
 import type { TableContext } from "./table/types/table.js";
 import { isDevelopment, isPackaged } from "./utils/env.js";
+import { retryUntil } from "./utils/helpers/rxjs.js";
 
 const userTableRefreshRequest$ = new BehaviorSubject(true);
 
@@ -105,6 +106,7 @@ const main = async () => {
 			let matchLoadouts: PreGameLoadouts | CoreGameLoadouts | undefined;
 
 			if (gameState === "MENUS") {
+				tableSpinner.start("Waiting for party presences...");
 				partyInfo = await api.core.getSelfPartyInfo();
 				presences = await presencesService.waitForPresencesOf(
 					api.helpers.getPlayerUUIDs(partyInfo.Members)
@@ -118,11 +120,10 @@ const main = async () => {
 				tableSpinner.start("Getting Match Id...");
 				const matchId = await messagesService.getPreGameMatchId();
 
-				matchData = await api.core.getPreGameMatchData(
-					matchId,
-					fetchUpdatedAgents
+				matchData = await retryUntil(
+					api.core.getPreGameMatchData(matchId, fetchUpdatedAgents)
 				);
-				matchLoadouts = await api.core.getPreGameLoadouts(matchId);
+				matchLoadouts = await retryUntil(api.core.getPreGameLoadouts(matchId));
 				tableSpinner.start("Waiting for player presences...");
 				presences = await presencesService.waitForPresencesOf(
 					api.helpers.getPlayerUUIDs(matchData.AllyTeam.Players),
@@ -135,8 +136,8 @@ const main = async () => {
 				tableSpinner.start("Getting Match Id...");
 				const matchId = await messagesService.getCoreGameMatchId();
 
-				matchData = await api.core.getCoreGameMatchData(matchId);
-				matchLoadouts = await api.core.getCoreGameLoadouts(matchId);
+				matchData = await retryUntil(api.core.getCoreGameMatchData(matchId));
+				matchLoadouts = await retryUntil(api.core.getCoreGameLoadouts(matchId));
 
 				tableSpinner.start("Waiting for player presences...");
 				presences = await presencesService.waitForPresencesOf(
