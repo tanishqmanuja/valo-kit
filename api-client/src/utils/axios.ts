@@ -10,7 +10,7 @@ import rateLimit, { RateLimitedAxiosInstance } from "axios-rate-limit";
 import { Agent } from "https";
 import { ApiClient } from "../api-client.js";
 
-const MAX_RPS = 6;
+const MAX_RPS = 8;
 const VAL_CACHE_TTL_MINS = 2;
 const EXTERNAL_CACHE_TTL_MINS = 15;
 const RETRY_LIMIT = 2;
