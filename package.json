@@ -6,7 +6,6 @@
     "build": "turbo build",
     "build:api-client": "turbo --filter=api-client build",
     "build:vry-js": "turbo --filter=vry-js build",
-    "start:vry-js": "turbo --filter=vry-js start",
     "dev": "turbo dev --parallel",
     "clean": "turbo clean && rimraf node_modules",
     "lint": "turbo lint",

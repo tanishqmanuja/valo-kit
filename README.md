@@ -90,13 +90,20 @@ corepack prepare pnpm@latest --activate
 pnpm i
 ```
 
-5. Start vRYjs
+5. Build the Monorepo
 
 ```shell
-pnpm start:vry-js
+pnpm build
 ```
 
-6. Package vRYjs (optional)
+6. Start vRYjs
+
+```shell
+cd vry-js
+pnpm start
+```
+
+7. Package vRYjs (optional)
 
 Do this if you want to make your own executable file
 
