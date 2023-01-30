@@ -8,7 +8,7 @@ import {
 	OnStateMenus,
 	OnStatePreGame,
 	TablePlugin,
-} from "../table/plugin.js";
+} from "../table/types/plugin.js";
 
 const COLUMN_HEADER = "Level";
 
@@ -25,7 +25,7 @@ export default class PlayerLevelPlugin
 		const levels = players
 			.map(p => p.private.accountLevel)
 			.map(l => colorizeLevel(l));
-		return this.table.addColumn(COLUMN_HEADER, levels);
+		return () => this.table.addColumn(COLUMN_HEADER, levels);
 	}
 
 	async onStatePreGame() {
@@ -35,7 +35,7 @@ export default class PlayerLevelPlugin
 		const levels = players
 			.map(player => player.PlayerIdentity.AccountLevel)
 			.map(l => colorizeLevel(l));
-		return this.table.addColumn(COLUMN_HEADER, levels);
+		return () => this.table.addColumn(COLUMN_HEADER, levels);
 	}
 
 	async onStateInGame() {
@@ -45,6 +45,6 @@ export default class PlayerLevelPlugin
 		const levels = players
 			.map(player => player.PlayerIdentity.AccountLevel)
 			.map(l => colorizeLevel(l));
-		return this.table.addColumn(COLUMN_HEADER, levels);
+		return () => this.table.addColumn(COLUMN_HEADER, levels);
 	}
 }

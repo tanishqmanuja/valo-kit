@@ -8,7 +8,7 @@ import {
 	OnStateMenus,
 	OnStatePreGame,
 	TablePlugin,
-} from "../table/plugin.js";
+} from "../table/types/plugin.js";
 import { getInterpolatedColor } from "../utils/helpers/colors.js";
 
 const COLUMN_HEADER = "WR(%)";
@@ -51,7 +51,7 @@ export default class PlayerWinRatePlugin
 
 			return `${chalk.hex(color)(winRatePerc)} (${winRateInfo.totalGames})`;
 		});
-		return this.table.addColumn(COLUMN_HEADER, winrates);
+		return () => this.table.addColumn(COLUMN_HEADER, winrates);
 	}
 
 	async onStatePreGame() {
@@ -85,7 +85,7 @@ export default class PlayerWinRatePlugin
 
 			return `${chalk.hex(color)(winRatePerc)} (${winRateInfo.totalGames})`;
 		});
-		return this.table.addColumn(COLUMN_HEADER, winrates);
+		return () => this.table.addColumn(COLUMN_HEADER, winrates);
 	}
 
 	async onStateInGame() {
@@ -119,6 +119,6 @@ export default class PlayerWinRatePlugin
 
 			return `${chalk.hex(color)(winRatePerc)} (${winRateInfo.totalGames})`;
 		});
-		return this.table.addColumn(COLUMN_HEADER, winrates);
+		return () => this.table.addColumn(COLUMN_HEADER, winrates);
 	}
 }

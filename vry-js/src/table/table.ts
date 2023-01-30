@@ -13,8 +13,8 @@ import PlayerWinRatePlugin from "../plugins/player-winrate.js";
 import SortByLevelPlugin from "../plugins/sort-by-level.js";
 import TeamSpacerPlugin from "../plugins/team-spacer.js";
 import { stripAnsiCodes } from "../utils/helpers/text.js";
-import { Table as ITable, TableContext } from "./interfaces.js";
 import { TablePluginManager } from "./plugin-manager.js";
+import { Table as ITable, TableContext } from "./types/table.js";
 
 const logger = getModuleLogger("Table");
 

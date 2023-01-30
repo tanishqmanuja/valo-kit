@@ -3,13 +3,13 @@ import {
 	PreGameMatchData,
 } from "@valo-kit/api-client/types";
 import { formatRank, RankFormattingStyle } from "../formatters/rank.js";
-import type { Table } from "../table/interfaces.js";
 import {
 	OnStateInGame,
 	OnStateMenus,
 	OnStatePreGame,
 	TablePlugin,
-} from "../table/plugin.js";
+} from "../table/types/plugin.js";
+import type { Table } from "../table/types/table.js";
 
 const COLUMN_HEADER = "Peak Rank";
 
@@ -51,7 +51,7 @@ export default class PlayerPeakRankPlugin
 			const bestTier = api.helpers.getBestCompetitiveTier(mmr!);
 			return this.formatForDisplay(bestTier);
 		});
-		return this.table.addColumn(COLUMN_HEADER, ranks);
+		return () => this.table.addColumn(COLUMN_HEADER, ranks);
 	}
 
 	async onStatePreGame() {
@@ -67,7 +67,7 @@ export default class PlayerPeakRankPlugin
 			const bestTier = api.helpers.getBestCompetitiveTier(mmr!);
 			return this.formatForDisplay(bestTier);
 		});
-		return this.table.addColumn(COLUMN_HEADER, ranks);
+		return () => this.table.addColumn(COLUMN_HEADER, ranks);
 	}
 
 	async onStateInGame() {
@@ -83,7 +83,7 @@ export default class PlayerPeakRankPlugin
 			const bestTier = api.helpers.getBestCompetitiveTier(mmr!);
 			return this.formatForDisplay(bestTier);
 		});
-		return this.table.addColumn(COLUMN_HEADER, ranks);
+		return () => this.table.addColumn(COLUMN_HEADER, ranks);
 	}
 
 	private formatForDisplay({

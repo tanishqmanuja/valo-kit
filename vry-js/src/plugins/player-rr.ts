@@ -7,7 +7,7 @@ import {
 	OnStateMenus,
 	OnStatePreGame,
 	TablePlugin,
-} from "../table/plugin.js";
+} from "../table/types/plugin.js";
 
 const COLUMN_HEADER = "RR";
 
@@ -34,7 +34,7 @@ export default class PlayerRankedRating
 			const tier = api.helpers.getCompetitiveTier(mmr!, currentSeason);
 			return tier.RankedRating;
 		});
-		return this.table.addColumn(COLUMN_HEADER, rr);
+		return () => this.table.addColumn(COLUMN_HEADER, rr);
 	}
 
 	async onStatePreGame() {
@@ -53,7 +53,7 @@ export default class PlayerRankedRating
 			const tier = api.helpers.getCompetitiveTier(mmr!, currentSeason);
 			return tier.RankedRating;
 		});
-		return this.table.addColumn(COLUMN_HEADER, rr);
+		return () => this.table.addColumn(COLUMN_HEADER, rr);
 	}
 
 	async onStateInGame() {
@@ -72,6 +72,6 @@ export default class PlayerRankedRating
 			const tier = api.helpers.getCompetitiveTier(mmr!, currentSeason);
 			return tier.RankedRating;
 		});
-		return this.table.addColumn(COLUMN_HEADER, rr);
+		return () => this.table.addColumn(COLUMN_HEADER, rr);
 	}
 }

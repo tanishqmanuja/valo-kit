@@ -8,7 +8,7 @@ import {
 	OnStateMenus,
 	OnStatePreGame,
 	TablePlugin,
-} from "../table/plugin.js";
+} from "../table/types/plugin.js";
 import { isStreamerModeEnabled } from "../utils/env.js";
 
 const COLUMN_HEADER = "Name";
@@ -30,7 +30,7 @@ export default class PlayerNamePlugin
 			const name = `${p.game_name}#${p.game_tag}`;
 			return chalk.rgb(221, 224, 41)(name);
 		});
-		return this.table.addColumn(COLUMN_HEADER, names);
+		return () => this.table.addColumn(COLUMN_HEADER, names);
 	}
 
 	async onStatePreGame() {
@@ -60,7 +60,7 @@ export default class PlayerNamePlugin
 			return chalk.rgb(76, 151, 237)(name);
 		});
 
-		return this.table.addColumn(COLUMN_HEADER, names);
+		return () => this.table.addColumn(COLUMN_HEADER, names);
 	}
 
 	async onStateInGame() {
@@ -94,6 +94,6 @@ export default class PlayerNamePlugin
 			return chalk.rgb(76, 151, 237)(name);
 		});
 
-		return this.table.addColumn(COLUMN_HEADER, names);
+		return () => this.table.addColumn(COLUMN_HEADER, names);
 	}
 }

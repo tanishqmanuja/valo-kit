@@ -1,14 +1,20 @@
 import { CoreGameMatchData } from "@valo-kit/api-client/types";
-import { OnStateInGame, TablePlugin } from "../table/plugin.js";
+import {
+	ExecPolicy,
+	OnStateInGame,
+	TablePlugin,
+} from "../table/types/plugin.js";
 
 export default class TeamSpacerPlugin
 	extends TablePlugin
 	implements OnStateInGame
 {
 	static id = "team-spacer";
-	name = "Team Spacer";
 
-	async onStateInGame() {
+	name = "Team Spacer";
+	execPolicy: ExecPolicy = "last";
+
+	onStateInGame() {
 		const { api, matchData } = this.table.context;
 		const inGameMatchData = matchData as CoreGameMatchData;
 		const players = inGameMatchData.Players;

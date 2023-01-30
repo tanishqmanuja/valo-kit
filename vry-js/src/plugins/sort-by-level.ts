@@ -1,5 +1,10 @@
 import CliTable3 from "cli-table3";
-import { OnStateInGame, OnStatePreGame, TablePlugin } from "../table/plugin.js";
+import {
+	ExecPolicy,
+	OnStateInGame,
+	OnStatePreGame,
+	TablePlugin,
+} from "../table/types/plugin.js";
 import { stripAnsiCodes } from "../utils/helpers/text.js";
 
 export default class SortByLevelPlugin
@@ -7,7 +12,10 @@ export default class SortByLevelPlugin
 	implements OnStatePreGame, OnStateInGame
 {
 	static id = "sort-by-level";
+	static deps = ["player-level", "team-spacer"];
+
 	name = "Sort By Level";
+	execPolicy: ExecPolicy = "last";
 
 	private sortLevel(column: CliTable3.Cell[]) {
 		const spaceIndex = column.findIndex(c => c === "");

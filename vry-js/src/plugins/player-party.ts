@@ -3,7 +3,11 @@ import {
 	PreGameMatchData,
 } from "@valo-kit/api-client/types";
 import chalk from "chalk";
-import { OnStateInGame, OnStatePreGame, TablePlugin } from "../table/plugin.js";
+import {
+	OnStateInGame,
+	OnStatePreGame,
+	TablePlugin,
+} from "../table/types/plugin.js";
 
 const selfPartySymbol = "●";
 const selfPartyIcon = chalk.rgb(221, 224, 41)(selfPartySymbol);
@@ -49,7 +53,7 @@ export default class PlayerPartyPlugin
 		});
 
 		if (parties.some(p => p !== "")) {
-			this.table.addColumn(COLUMN_HEADER, parties);
+			return () => this.table.addColumn(COLUMN_HEADER, parties);
 		}
 	}
 
@@ -76,7 +80,7 @@ export default class PlayerPartyPlugin
 		});
 
 		if (parties.some(p => p !== "")) {
-			this.table.addColumn(COLUMN_HEADER, parties);
+			return () => this.table.addColumn(COLUMN_HEADER, parties);
 		}
 	}
 }

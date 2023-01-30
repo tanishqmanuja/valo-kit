@@ -4,7 +4,11 @@ import {
 } from "@valo-kit/api-client/types";
 import chalk from "chalk";
 import { colorizeAgent } from "../formatters/agent.js";
-import { OnStateInGame, OnStatePreGame, TablePlugin } from "../table/plugin.js";
+import {
+	OnStateInGame,
+	OnStatePreGame,
+	TablePlugin,
+} from "../table/types/plugin.js";
 
 const COLUMN_HEADER = "Agent";
 
@@ -34,7 +38,7 @@ export default class PlayerAgentPlugin
 
 			return chalk.gray(agentName ?? "");
 		});
-		return this.table.addColumn(COLUMN_HEADER, agentsList);
+		return () => this.table.addColumn(COLUMN_HEADER, agentsList);
 	}
 
 	async onStateInGame() {
@@ -55,6 +59,6 @@ export default class PlayerAgentPlugin
 
 			return colorizeAgent(agentName);
 		});
-		return this.table.addColumn(COLUMN_HEADER, agentsList);
+		return () => this.table.addColumn(COLUMN_HEADER, agentsList);
 	}
 }

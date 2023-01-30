@@ -8,7 +8,7 @@ import { z } from "zod";
 import { BaseError } from "../error/base-error.js";
 import { getModuleLogger } from "../logger/logger.js";
 import { filesAccessible } from "../utils/helpers/files.js";
-import { Table } from "./interfaces.js";
+import type { Table } from "./types/table.js";
 
 import type {
 	OnStateInGame,
@@ -16,7 +16,7 @@ import type {
 	OnStatePreGame,
 	TablePlugin,
 	TablePluginCtor,
-} from "./plugin.js";
+} from "./types/plugin.js";
 
 const logger = getModuleLogger("Plugin Manager");
 
@@ -89,11 +89,23 @@ export class TablePluginManager
 				? ` with flag${flags.length > 1 ? "s" : ""} ${flags.join(",")}`
 				: "";
 
+		const isDepsFulfilled = (deps: string[]) =>
+			deps.every(
+				d =>
+					this.internalPlugins.find(p => p.id === d) ||
+					this.externalPlugins.find(p => p.id === d)
+			);
+
 		if (internal) {
 			if (!internalRegistry) {
 				logger.error(
 					`Plugin with id ${pluginId} not found in internal registry`
 				);
+				return;
+			}
+
+			if (!isDepsFulfilled(internalRegistry.Ctor.deps)) {
+				logger.error(`Deps not fulfilled for plugin with id ${pluginId}`);
 				return;
 			}
 
@@ -110,6 +122,11 @@ export class TablePluginManager
 				logger.info(
 					`Using Internal plugin with id ${pluginId} not found in external registry`
 				);
+
+				if (!isDepsFulfilled(internalRegistry.Ctor.deps)) {
+					logger.error(`Deps not fulfilled for plugin with id ${pluginId}`);
+					return;
+				}
 
 				plugin = new internalRegistry.Ctor(this.table, flags);
 				this.activatedPlugins.push(plugin);
@@ -222,7 +239,29 @@ export class TablePluginManager
 	}
 
 	async onStateMenus() {
-		for (let plugin of this.activatedPlugins) {
+		const autoPlugins = this.activatedPlugins.filter(
+			p => p.execPolicy === "auto"
+		);
+
+		const lastPlugins = this.activatedPlugins.filter(
+			p => p.execPolicy === "last"
+		);
+
+		const promises = await Promise.allSettled(
+			autoPlugins.map(plugin => plugin.onStateMenus?.())
+		);
+
+		promises.forEach((p, i) => {
+			const plugin = autoPlugins[i];
+			if (p.status === "fulfilled") {
+				p.value?.();
+			}
+			if (p.status === "rejected") {
+				logger.error(`[${plugin.name}][OnStateMenu] ${p.reason}`);
+			}
+		});
+
+		for (let plugin of lastPlugins) {
 			if (plugin.onStateMenus) {
 				try {
 					await plugin.onStateMenus();
@@ -234,7 +273,29 @@ export class TablePluginManager
 	}
 
 	async onStatePreGame() {
-		for (let plugin of this.activatedPlugins) {
+		const autoPlugins = this.activatedPlugins.filter(
+			p => p.execPolicy === "auto"
+		);
+
+		const lastPlugins = this.activatedPlugins.filter(
+			p => p.execPolicy === "last"
+		);
+
+		const promises = await Promise.allSettled(
+			autoPlugins.map(plugin => plugin.onStatePreGame?.())
+		);
+
+		promises.forEach((p, i) => {
+			const plugin = autoPlugins[i];
+			if (p.status === "fulfilled") {
+				p.value?.();
+			}
+			if (p.status === "rejected") {
+				logger.error(`[${plugin.name}][OnStatePreGame] ${p.reason}`);
+			}
+		});
+
+		for (let plugin of lastPlugins) {
 			if (plugin.onStatePreGame) {
 				try {
 					await plugin.onStatePreGame();
@@ -246,7 +307,29 @@ export class TablePluginManager
 	}
 
 	async onStateInGame() {
-		for (let plugin of this.activatedPlugins) {
+		const autoPlugins = this.activatedPlugins.filter(
+			p => p.execPolicy === "auto"
+		);
+
+		const lastPlugins = this.activatedPlugins.filter(
+			p => p.execPolicy === "last"
+		);
+
+		const promises = await Promise.allSettled(
+			autoPlugins.map(plugin => plugin.onStateInGame?.())
+		);
+
+		promises.forEach((p, i) => {
+			const plugin = autoPlugins[i];
+			if (p.status === "fulfilled") {
+				p.value?.();
+			}
+			if (p.status === "rejected") {
+				logger.error(`[${plugin.name}][OnStateInGame] ${p.reason}`);
+			}
+		});
+
+		for (let plugin of lastPlugins) {
 			if (plugin.onStateInGame) {
 				try {
 					await plugin.onStateInGame();

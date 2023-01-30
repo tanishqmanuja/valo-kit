@@ -1,7 +1,7 @@
 import { createLogger, format, transports } from "winston";
 import "winston-daily-rotate-file";
 
-import type { TablePlugin } from "../table/plugin.js";
+import type { TablePlugin } from "../table/types/plugin.js";
 
 const fileTransport = new transports.DailyRotateFile({
 	filename: "logs/cli-%DATE%.log",

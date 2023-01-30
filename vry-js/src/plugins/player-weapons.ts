@@ -1,4 +1,4 @@
-import { TablePlugin } from "../table/plugin.js";
+import { TablePlugin } from "../table/types/plugin.js";
 
 import type {
 	CoreGameLoadouts,
@@ -8,8 +8,8 @@ import type {
 } from "@valo-kit/api-client/types";
 import chalk from "chalk";
 import { getSkinColorFromTier } from "../formatters/weapon.js";
-import { Table } from "../table/interfaces.js";
-import type { OnStateInGame, OnStatePreGame } from "../table/plugin.js";
+import type { OnStateInGame, OnStatePreGame } from "../table/types/plugin.js";
+import { Table } from "../table/types/table.js";
 
 export const weaponSocketsLUT = {
 	"bcef87d6-209b-46c6-8b19-fbe40bd95abc": "skin",
@@ -114,7 +114,7 @@ export default class PlayerWeaponsPlugin
 		});
 
 		if (skins) {
-			return this.table.addColumn(this.preferredWeapon, skins);
+			return () => this.table.addColumn(this.preferredWeapon, skins);
 		}
 	}
 
@@ -136,7 +136,7 @@ export default class PlayerWeaponsPlugin
 		});
 
 		if (skins) {
-			return this.table.addColumn(this.preferredWeapon, skins);
+			return () => this.table.addColumn(this.preferredWeapon, skins);
 		}
 	}
 

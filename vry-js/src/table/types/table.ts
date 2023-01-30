@@ -7,13 +7,14 @@ import type {
 	CoreGameMatchData,
 	GameState,
 	Map,
+	PartyInfo,
 	PreGameLoadouts,
 	PreGameMatchData,
 	Presences,
 	Weapon,
 } from "@valo-kit/api-client/types";
+import type CliTable3 from "cli-table3";
 import type { Cell } from "cli-table3";
-import CliTable3 from "cli-table3";
 import type { Logger } from "winston";
 import type { TablePlugin } from "./plugin.js";
 
@@ -26,6 +27,7 @@ export type TableContext = {
 	maps: Map[];
 	gameState: GameState;
 	presences: Presences;
+	partyInfo?: PartyInfo;
 	matchData?: PreGameMatchData | CoreGameMatchData;
 	matchLoadouts?: PreGameLoadouts | CoreGameLoadouts;
 };

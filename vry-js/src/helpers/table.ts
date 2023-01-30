@@ -2,7 +2,7 @@ import { getQueueName } from "../formatters/queue.js";
 
 import type { ApiClient } from "@valo-kit/api-client";
 import { colorizeGameState } from "../formatters/gamestate.js";
-import { TableContext } from "../table/interfaces.js";
+import { TableContext } from "../table/types/table.js";
 import type { EssentialContent } from "./content.js";
 
 export const getTableHeader = async (
