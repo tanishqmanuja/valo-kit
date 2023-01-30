@@ -1,6 +1,9 @@
 import { ApiClient } from "@valo-kit/api-client";
 import type {
+	CoreGameLoadouts,
 	CoreGameMatchData,
+	PartyInfo,
+	PreGameLoadouts,
 	PreGameMatchData,
 	Presences,
 } from "@valo-kit/api-client/types";
@@ -11,6 +14,7 @@ import {
 	bufferCount,
 	combineLatest,
 	map,
+	merge,
 	retry,
 	skip,
 	startWith,
@@ -19,6 +23,7 @@ import {
 	throttleTime,
 	timer,
 } from "rxjs";
+import { CommandManager } from "./commands/handler.js";
 import { ErrorHandler } from "./error/error-handler.js";
 import {
 	logStartingBanner,
@@ -30,11 +35,12 @@ import { enableHotkeyDetector } from "./helpers/hotkeys.js";
 import { getTableHeader } from "./helpers/table.js";
 import { waitForLogin } from "./helpers/valorant.js";
 import { apiLogger, getModuleLogger } from "./logger/logger.js";
+import { ChatService } from "./services/chat.js";
 import { MessagesService } from "./services/messages.js";
 import { PresencesService } from "./services/presences.js";
 import { WebSocketService } from "./services/websocket.js";
-import type { TableContext } from "./table/interfaces.js";
 import { Table } from "./table/table.js";
+import type { TableContext } from "./table/types/table.js";
 import { isDevelopment, isPackaged } from "./utils/env.js";
 
 const userTableRefreshRequest$ = new BehaviorSubject(true);
@@ -55,6 +61,7 @@ const main = async () => {
 	const webSocketService = new WebSocketService(api);
 	const presencesService = new PresencesService(api, webSocketService);
 	const messagesService = new MessagesService(api, webSocketService);
+	const chatService = new ChatService(api, webSocketService);
 
 	const essentialContent = await fetchEssentialContent(api);
 
@@ -68,13 +75,15 @@ const main = async () => {
 	const table = new Table(ctx);
 	await table.initPlugins();
 
+	const cmdManager = new CommandManager(api);
+
 	enableHotkeyDetector(userTableRefreshRequest$);
 
 	const tableSpinner = ora();
 	tableSpinner.start("Detecting Game State...");
 
 	const tableRenewEvents$ = combineLatest([
-		presencesService.onGameStateChange$,
+		presencesService.gameState$,
 		userTableRefreshRequest$.pipe(throttleTime(10 * 1000)),
 	]).pipe(map(([state]) => state));
 
@@ -89,11 +98,18 @@ const main = async () => {
 			tableSpinner.start("Renewing Self Presence...");
 		}),
 		switchMap(async ([previousGameState, gameState]) => {
-			let presences: Presences =
-				await presencesService.getPresencesWithSelfPresence();
+			let presences: Presences = [];
 
+			let partyInfo: PartyInfo | undefined;
 			let matchData: PreGameMatchData | CoreGameMatchData | undefined;
-			let matchLoadouts;
+			let matchLoadouts: PreGameLoadouts | CoreGameLoadouts | undefined;
+
+			if (gameState === "MENUS") {
+				partyInfo = await api.core.getSelfPartyInfo();
+				presences = await presencesService.waitForPresencesOf(
+					api.helpers.getPlayerUUIDs(partyInfo.Members)
+				);
+			}
 
 			if (gameState === "PREGAME") {
 				tableSpinner.start("Fetching PreGame Data...");
@@ -141,6 +157,7 @@ const main = async () => {
 			await table.updateContext({
 				gameState,
 				presences,
+				partyInfo,
 				matchData,
 				matchLoadouts,
 			});
@@ -195,7 +212,13 @@ const main = async () => {
 		})
 	);
 
-	tableGenerator$.subscribe();
+	const commandHandler$ = chatService.commands$.pipe(
+		tap(async command => {
+			await cmdManager.handleCommand(command);
+		})
+	);
+
+	merge(tableGenerator$, commandHandler$).subscribe();
 };
 
 try {

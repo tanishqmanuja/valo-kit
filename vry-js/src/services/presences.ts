@@ -12,6 +12,7 @@ import {
 	mergeMap,
 	retry,
 	scan,
+	shareReplay,
 	switchMap,
 	take,
 	tap,
@@ -27,46 +28,17 @@ const WS_EVENT_PRESENCES = "OnJsonApiEvent_chat_v4_presences";
 
 export class PresencesService {
 	presences$ = new BehaviorSubject<Presences>([]);
+	collectedPresences$ = new BehaviorSubject<Presences>([])
 
 	selfPresence$ = this.presences$.pipe(
 		filter(presences => presences.some(it => it.puuid === this.api.self.puuid)),
-		map(presences => this.api.helpers.getSelfPresence(presences))
+		map(presences => this.api.helpers.getSelfPresence(presences)),
+		shareReplay(1)
 	);
 
 	gameState$ = this.selfPresence$.pipe(
-		map(presence => this.api.helpers.getGameState([presence]))
-	);
-
-	onGameStateChange$ = this.gameState$.pipe(distinctUntilChanged());
-
-	collectedPresences$ = combineLatest([
-		this.presences$,
-		this.onGameStateChange$,
-	]).pipe(
-		map(([presences, gameState]) => ({ presences, gameState })),
-		scan((pre, curr) => {
-			if (pre.gameState !== curr.gameState && curr.gameState === "MENUS") {
-				const mergedPresences = this.api.helpers.mergePresences(
-					pre.presences,
-					curr.presences
-				);
-				return {
-					...curr,
-					presences:
-						this.api.helpers.getMyPartyPlayersPresences(mergedPresences),
-				};
-			}
-
-			return {
-				...pre,
-				gameState: curr.gameState,
-				presences: this.api.helpers.mergePresences(
-					pre.presences,
-					curr.presences
-				),
-			};
-		}),
-		map(d => d.presences)
+		map(presence => this.api.helpers.getGameState([presence])),
+		distinctUntilChanged()
 	);
 
 	constructor(
@@ -94,7 +66,39 @@ export class PresencesService {
 			tap(presences => this.presences$.next(presences))
 		);
 
-		merge(updatePresencesThroughApiOnce$, presencesUpdater$).subscribe();
+		const collectedPresencesUpdater$ = combineLatest([
+			this.presences$,
+			this.gameState$,
+		]).pipe(
+			map(([presences, gameState]) => ({ presences, gameState })),
+			scan((pre, curr) => {
+				if (pre.gameState !== curr.gameState && curr.gameState === "MENUS") {
+					const mergedPresences = this.api.helpers.mergePresences(
+						pre.presences,
+						curr.presences
+					);
+					return {
+						...curr,
+						presences:
+							this.api.helpers.getMyPartyPlayersPresences(mergedPresences),
+					};
+				}
+	
+				return {
+					...pre,
+					gameState: curr.gameState,
+					presences: this.api.helpers.mergePresences(
+						pre.presences,
+						curr.presences
+					),
+				};
+			}),
+			map(d => d.presences),
+			tap(p => this.collectedPresences$.next(p))
+		);
+	
+
+		merge(updatePresencesThroughApiOnce$, presencesUpdater$, collectedPresencesUpdater$).subscribe();
 	}
 
 	async getGameState() {
