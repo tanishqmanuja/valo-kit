@@ -45,7 +45,7 @@ export abstract class OnStateInGame {
 
 class SampleTablePlugin extends TablePlugin {
 	static id = "sample-plugin";
-	static deps = [];
+	static deps: string[] = [];
 
 	name = "Sample Plugin";
 	execPolicy: ExecPolicy = "auto";
