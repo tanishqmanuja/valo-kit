@@ -108,8 +108,11 @@ const main = async () => {
 			let matchLoadouts: PreGameLoadouts | CoreGameLoadouts | undefined;
 
 			if (gameState === "MENUS") {
+				tableSpinner.start("Getting Party Id...");
+				const partyId = await messagesService.getPartyId();
+
 				tableSpinner.start("Waiting for party presences...");
-				partyInfo = await retryUntil(api.core.getSelfPartyInfo());
+				partyInfo = await retryUntil(api.core.getSelfPartyInfo(partyId));
 				presences = await presencesService.waitForPresencesOf(
 					api.helpers.getPlayerUUIDs(partyInfo.Members)
 				);

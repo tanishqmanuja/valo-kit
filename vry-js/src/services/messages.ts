@@ -22,6 +22,7 @@ type MatchIdEvent = {
 };
 
 export class MessagesService {
+	partyId$ = new ReplaySubject<string>(1);
 	matchId$ = new ReplaySubject<MatchIdEvent>(1);
 
 	constructor(
@@ -29,6 +30,21 @@ export class MessagesService {
 		private webSocketService: WebSocketService
 	) {
 		this.webSocketService.enableListenerForEvent(WS_EVENT_MESSAGES);
+
+		const partyIdUpdater$ = this.webSocketService.webSocketEvents$.pipe(
+			filter(res => res.event === WS_EVENT_MESSAGES && res.data.data),
+			filter(
+				res =>
+					res.data.data.service === "parties" &&
+					res.data.data.resource.startWith("ares-parties/parties/v1/parties/")
+			),
+			map(res => {
+				const { resource } = res.data.data;
+				return resource.split("/").pop();
+			}),
+			distinctUntilChanged(),
+			tap(partyId => this.partyId$.next(partyId))
+		);
 
 		const matchIdUpdater$ = this.webSocketService.webSocketEvents$.pipe(
 			filter(res => res.event === WS_EVENT_MESSAGES && res.data.data),
@@ -52,7 +68,16 @@ export class MessagesService {
 			tap(matchIdEvent => this.matchId$.next(matchIdEvent))
 		);
 
-		merge(matchIdUpdater$).subscribe();
+		merge(partyIdUpdater$, matchIdUpdater$).subscribe();
+	}
+
+	async getPartyId() {
+		const partyIdApi$ = defer(() =>
+			from(this.api.core.getSelfPartyId()).pipe(retry({ delay: 2000 }))
+		);
+		const partyId$ = merge(this.partyId$, partyIdApi$).pipe(filter(Boolean));
+
+		return firstValueFrom(partyId$);
 	}
 
 	async getPreGameMatchId() {
