@@ -21,7 +21,7 @@ export default class PlayerMatchesPlugin
 
 	private logger = this.table.getPluginLogger(this);
 
-	private numMatches = 2;
+	private numMatches = 1;
 
 	constructor(table: Table, flags?: string[]) {
 		super(table, flags);
