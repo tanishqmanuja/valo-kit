@@ -22,7 +22,7 @@ const logger = getModuleLogger("Plugin Manager");
 
 const pluginsSchema = z.record(
 	z.string(),
-	z.union([z.array(z.string()), z.boolean().default(true)])
+	z.union([z.array(z.coerce.string()), z.boolean().default(true)])
 );
 
 const PluginsConfig = z.object({
