@@ -13,15 +13,19 @@ import type { Command, CommandContext } from "./types.js";
 export function skinCommandHandler(command: Command, context: CommandContext) {
 	const preferredWeapon = command.params[0]?.toLowerCase() as WeaponName;
 
+	if (!preferredWeapon) {
+		return "Usage !skin weapon-name";
+	}
+
 	if (!weaponsList.includes(preferredWeapon)) {
-		return;
+		return "Invalid weapon name";
 	}
 
 	const { api, agents, gameState, matchData, matchLoadouts, weapons } = context;
 	const inGameLoadouts = matchLoadouts as CoreGameLoadouts;
 
 	if (gameState !== "INGAME") {
-		return;
+		return "Command only valid when in-game";
 	}
 
 	const inGameMatchData = matchData as CoreGameMatchData;
@@ -47,12 +51,16 @@ export function skinCommandHandler(command: Command, context: CommandContext) {
 		return name;
 	});
 
-	let res = capitalizeFirstLetter(preferredWeapon) + " ♦ ";
+	let response = "";
 	skinsList.forEach((skin, index) => {
 		if (skin.toLowerCase() !== "standard") {
-			res += `${agentsList[index]} - ${skin}` + " ♦ ";
+			response += `${agentsList[index]} - ${skin}` + " ♦ ";
 		}
 	});
 
-	return res;
+	if (response === "") {
+		return `No player have ${capitalizeFirstLetter(preferredWeapon)} skin.`;
+	}
+
+	return capitalizeFirstLetter(preferredWeapon) + " ♦ " + response;
 }
