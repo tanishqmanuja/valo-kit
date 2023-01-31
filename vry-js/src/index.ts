@@ -36,6 +36,7 @@ import { getTableHeader } from "./helpers/table.js";
 import { waitForLogin } from "./helpers/valorant.js";
 import { apiLogger, getModuleLogger } from "./logger/logger.js";
 import { ChatService } from "./services/chat.js";
+import { CommandService } from "./services/command.js";
 import { MessagesService } from "./services/messages.js";
 import { PresencesService } from "./services/presences.js";
 import { WebSocketService } from "./services/websocket.js";
@@ -63,6 +64,7 @@ const main = async () => {
 	const presencesService = new PresencesService(api, webSocketService);
 	const messagesService = new MessagesService(api, webSocketService);
 	const chatService = new ChatService(api, webSocketService);
+	const commandService = new CommandService(chatService);
 
 	const essentialContent = await fetchEssentialContent(api);
 
@@ -96,7 +98,7 @@ const main = async () => {
 	const tableGenerator$ = bufferedGameStates$.pipe(
 		tap(() => {
 			table.clear();
-			tableSpinner.start("Renewing Self Presence...");
+			tableSpinner.start("Initializing Table...");
 		}),
 		switchMap(async ([previousGameState, gameState]) => {
 			let presences: Presences = [];
@@ -107,7 +109,7 @@ const main = async () => {
 
 			if (gameState === "MENUS") {
 				tableSpinner.start("Waiting for party presences...");
-				partyInfo = await api.core.getSelfPartyInfo();
+				partyInfo = await retryUntil(api.core.getSelfPartyInfo());
 				presences = await presencesService.waitForPresencesOf(
 					api.helpers.getPlayerUUIDs(partyInfo.Members)
 				);
@@ -213,9 +215,9 @@ const main = async () => {
 		})
 	);
 
-	const commandHandler$ = chatService.commands$.pipe(
+	const commandHandler$ = commandService.commands$.pipe(
 		tap(async command => {
-			await cmdManager.handleCommand(command);
+			await cmdManager.handleCommand(command, table.context);
 		})
 	);
 

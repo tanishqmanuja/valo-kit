@@ -1,4 +1,5 @@
-import { MaybePromise } from "../utils/helpers/types.js";
+import type { TableContext } from "../table/types/table.js";
+import type { MaybePromise } from "../utils/helpers/types.js";
 
 export type Command = {
 	cid: string;
@@ -7,4 +8,9 @@ export type Command = {
 	params: string[];
 };
 
-export type CommandHandlerFn = (command: Command) => MaybePromise<string>;
+export type CommandContext = TableContext;
+
+export type CommandHandlerFn = (
+	command: Command,
+	context: CommandContext
+) => MaybePromise<string | undefined>;

@@ -7,7 +7,6 @@ import {
 	map,
 	Observable,
 } from "rxjs";
-import type { Command } from "../commands/types.js";
 import type { WebSocketService } from "./websocket.js";
 
 export type Message = {
@@ -31,7 +30,7 @@ const WS_EVENT_CHAT_MESSAGES = "OnJsonApiEvent_chat_v5_messages";
 export class ChatService {
 	messages$: Observable<Message>;
 	partyMessages$: Observable<Message>;
-	commands$: Observable<Command>;
+	coreGameMessages$: Observable<Message>;
 
 	constructor(
 		private api: ApiClient,
@@ -56,26 +55,8 @@ export class ChatService {
 			filter(msg => msg.mid.includes("ares-parties"))
 		);
 
-		this.commands$ = this.partyMessages$.pipe(
-			filter(msg => msg.body.startsWith("!")),
-			map(msg => {
-				const from = msg.puuid;
-
-				const commandRegex = /^!(?<name>\w+)(?: (?<params>.*))?$/gm;
-				const { name, params } = commandRegex.exec(msg.body)?.groups ?? {};
-
-				if (!name) {
-					return undefined;
-				}
-				const cmd: Command = {
-					cid: msg.cid,
-					from,
-					name,
-					params: params?.split(/\s/) ?? [],
-				};
-				return cmd;
-			}),
-			filter(Boolean)
+		this.coreGameMessages$ = this.messages$.pipe(
+			filter(msg => msg.mid.includes("ares-coregame"))
 		);
 	}
 }
