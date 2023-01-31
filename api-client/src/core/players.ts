@@ -12,6 +12,7 @@ export async function getDisplayNames(this: ApiClient, playerUUIDs: string[]) {
 		{
 			method: "PUT",
 			data: JSON.stringify(playerUUIDs),
+			cache: true,
 		}
 	);
 

@@ -11,7 +11,7 @@ import { Agent } from "https";
 import { ApiClient } from "../api-client.js";
 
 const MAX_RPS = 8;
-const VAL_CACHE_TTL_MINS = 2;
+const VAL_CACHE_TTL_MINS = 5;
 const EXTERNAL_CACHE_TTL_MINS = 15;
 const RETRY_LIMIT = 2;
 const RETRY_DELAY_MS = 2 * 1000;
