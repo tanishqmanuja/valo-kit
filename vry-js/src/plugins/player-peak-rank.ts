@@ -117,12 +117,10 @@ export default class PlayerPeakRankPlugin
 			competitiveTiers
 		);
 
-		if (!episodeCompetitiveTiers) {
-			const rank = api.helpers.getRankName(Rank, latestCompetitiveTiers);
-			return formatRank(rank, this.preferredFormattingStyle);
-		}
-
-		const rank = api.helpers.getRankName(Rank, episodeCompetitiveTiers);
+		const rank = api.helpers.getRankName(
+			Rank,
+			episodeCompetitiveTiers ?? latestCompetitiveTiers
+		);
 
 		return `${formatRank(
 			rank,
