@@ -12,8 +12,6 @@ import {
 } from "../table/types/plugin.js";
 import { Table } from "../table/types/table.js";
 
-const COLUMN_HEADER = "Prev Matches";
-
 export default class PlayerMatchesPlugin
 	extends TablePlugin
 	implements OnStateMenus, OnStatePreGame, OnStateInGame
@@ -54,7 +52,7 @@ export default class PlayerMatchesPlugin
 				it.map(r => formatMatchResult(r)).join(chalk.gray(" • ")) ||
 				chalk.gray(" • ")
 		);
-		return () => this.table.addColumn(COLUMN_HEADER, results);
+		return () => this.table.addColumn(this.getColumnHeader(), results);
 	}
 
 	async onStatePreGame() {
@@ -69,7 +67,7 @@ export default class PlayerMatchesPlugin
 				it.map(r => formatMatchResult(r)).join(chalk.gray(" • ")) ||
 				chalk.gray(" • ")
 		);
-		return () => this.table.addColumn(COLUMN_HEADER, results);
+		return () => this.table.addColumn(this.getColumnHeader(), results);
 	}
 
 	async onStateInGame() {
@@ -84,7 +82,14 @@ export default class PlayerMatchesPlugin
 				it.map(r => formatMatchResult(r)).join(chalk.gray(" • ")) ||
 				chalk.gray(" • ")
 		);
-		return () => this.table.addColumn(COLUMN_HEADER, results);
+		return () => this.table.addColumn(this.getColumnHeader(), results);
+	}
+
+	private getColumnHeader() {
+		if (this.numMatches === 1) {
+			return "Prev Match";
+		}
+		return "Prev Matches";
 	}
 
 	private async getHistory(puuid: string) {
