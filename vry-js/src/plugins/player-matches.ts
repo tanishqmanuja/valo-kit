@@ -49,8 +49,10 @@ export default class PlayerMatchesPlugin
 		const matchesResults = await Promise.all(
 			players.map(p => this.getHistory(p.puuid))
 		);
-		const results = matchesResults.map(it =>
-			it.map(r => formatMatchResult(r)).join(chalk.gray(" • "))
+		const results = matchesResults.map(
+			it =>
+				it.map(r => formatMatchResult(r)).join(chalk.gray(" • ")) ||
+				chalk.gray(" • ")
 		);
 		return () => this.table.addColumn(COLUMN_HEADER, results);
 	}
@@ -62,8 +64,10 @@ export default class PlayerMatchesPlugin
 		const matchesResults = await Promise.all(
 			players.map(p => this.getHistory(p.Subject))
 		);
-		const results = matchesResults.map(it =>
-			it.map(r => formatMatchResult(r)).join(chalk.gray(" • "))
+		const results = matchesResults.map(
+			it =>
+				it.map(r => formatMatchResult(r)).join(chalk.gray(" • ")) ||
+				chalk.gray(" • ")
 		);
 		return () => this.table.addColumn(COLUMN_HEADER, results);
 	}
@@ -75,8 +79,10 @@ export default class PlayerMatchesPlugin
 		const matchesResults = await Promise.all(
 			players.map(p => this.getHistory(p.Subject))
 		);
-		const results = matchesResults.map(it =>
-			it.map(r => formatMatchResult(r)).join(chalk.gray(" • "))
+		const results = matchesResults.map(
+			it =>
+				it.map(r => formatMatchResult(r)).join(chalk.gray(" • ")) ||
+				chalk.gray(" • ")
 		);
 		return () => this.table.addColumn(COLUMN_HEADER, results);
 	}
