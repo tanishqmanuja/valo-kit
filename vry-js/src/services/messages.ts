@@ -36,7 +36,7 @@ export class MessagesService {
 			filter(
 				res =>
 					res.data.data.service === "parties" &&
-					res.data.data.resource.startWith("ares-parties/parties/v1/parties/")
+					res.data.data.resource.includes("ares-parties/parties/v1/parties/")
 			),
 			map(res => {
 				const { resource } = res.data.data;
