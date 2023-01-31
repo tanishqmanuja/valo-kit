@@ -10,11 +10,11 @@ export async function getSelfPartyId(this: ApiClient) {
 	return partyRes.CurrentPartyID;
 }
 
-export async function getSelfPartyInfo(this: ApiClient) {
-	const partyId = await this.core.getSelfPartyId()
+export async function getSelfPartyInfo(this: ApiClient, partyId?: string) {
+	const _partyId = partyId ?? (await this.core.getSelfPartyId());
 	const { data: partyInfo } = await this.fetch<PartyInfo>(
 		"glz",
-		`/parties/v1/parties/${partyId}`
+		`/parties/v1/parties/${_partyId}`
 	);
 
 	return partyInfo;
