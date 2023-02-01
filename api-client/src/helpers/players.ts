@@ -1,6 +1,7 @@
 import type { ApiClient } from "../api-client.js";
 import type { CoreGameMatchData } from "../types/coregame.js";
 import type { PlayerName } from "../types/names.js";
+import type { Player } from "../types/player.js";
 import type { Presences } from "../types/presence.js";
 
 export function getDisplayNamesFromPresences(
@@ -18,8 +19,10 @@ export function getDisplayNamesFromPresences(
 	});
 }
 
-export function getPlayerUUIDs(players: Array<{ Subject: string }>) {
-	return players.map(p => p.Subject);
+export function getPlayerUUIDs(presences: Presences): string[];
+export function getPlayerUUIDs(players: Pick<Player, "Subject">[]): string[];
+export function getPlayerUUIDs(p: any[]) {
+	return p.map(p => p.puuid ?? p.Subject);
 }
 
 export function isInBlueTeam(
