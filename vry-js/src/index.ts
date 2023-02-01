@@ -55,7 +55,10 @@ const logger = getModuleLogger("Main");
 
 const errorHandler = new ErrorHandler(logger);
 
-const api = new ApiClient(apiLogger);
+const api = new ApiClient({
+	maxRPS: 6,
+	logger: apiLogger,
+});
 
 const main = async () => {
 	await waitForLogin(api);
