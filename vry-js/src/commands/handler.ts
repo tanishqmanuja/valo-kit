@@ -28,7 +28,7 @@ export class CommandManager {
 				await this.api.core.postChatMessage(
 					command.cid,
 					`${MSG_PREFIX} ${res}`,
-					"system"
+					"groupchat"
 				);
 			}
 		}

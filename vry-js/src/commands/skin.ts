@@ -37,7 +37,7 @@ export function skinCommandHandler(command: Command, context: CommandContext) {
 			agents
 		)?.displayName;
 
-		const teamName = player.TeamID === myTeamId ? "" : "Enemy";
+		const teamName = player.TeamID === myTeamId ? "" : "Enemy ";
 
 		return `${teamName}${agentName ?? "Unknown Agent"}`;
 	});
