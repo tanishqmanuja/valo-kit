@@ -1,4 +1,7 @@
-import { CacheRequestConfig } from "axios-cache-interceptor";
+import {
+	AxiosCacheInstance,
+	CacheRequestConfig,
+} from "axios-cache-interceptor";
 import { objectEntries, objectFromEntries } from "ts-extras";
 import * as core from "./core/index.js";
 import * as external from "./external/index.js";
@@ -11,10 +14,10 @@ import {
 } from "./utils/auth.js";
 import {
 	externalAxios,
+	fetchClientWithRate,
 	injectLoggerCached,
 	injectValorantAutoRefreshToken,
 	Logger,
-	valorantAxios,
 } from "./utils/axios.js";
 import { parseLockFile } from "./utils/lockfile.js";
 import { parseLogFile } from "./utils/logfile.js";
@@ -72,12 +75,16 @@ export class ApiClient {
 
 	private authJWTExpiry: number | null = null;
 
-	constructor(private logger: Logger) {
-		injectValorantAutoRefreshToken(valorantAxios, this);
+	private valAxios: AxiosCacheInstance;
 
-		if (this.logger) {
-			injectLoggerCached(valorantAxios, logger);
-			injectLoggerCached(externalAxios, logger);
+	constructor(private config: { maxRPS?: number; logger?: Logger }) {
+		this.valAxios = fetchClientWithRate(config.maxRPS);
+
+		injectValorantAutoRefreshToken(this.valAxios, this);
+
+		if (this.config.logger) {
+			injectLoggerCached(this.valAxios, this.config.logger);
+			injectLoggerCached(externalAxios, this.config.logger);
 		}
 	}
 
@@ -163,9 +170,7 @@ export class ApiClient {
 
 		const headers = server === "local" ? this.localHeaders : this.authHeaders;
 
-		const instance = valorantAxios;
-
-		return instance<T>(endpoint, {
+		return this.valAxios<T>(endpoint, {
 			baseURL: this.servers[server],
 			method: "GET",
 			...config,

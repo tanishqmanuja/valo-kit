@@ -10,7 +10,7 @@ import rateLimit, { RateLimitedAxiosInstance } from "axios-rate-limit";
 import { Agent } from "https";
 import { ApiClient } from "../api-client.js";
 
-const MAX_RPS = 8;
+const MAX_RPS = 6;
 const VAL_CACHE_TTL_MINS = 5;
 const EXTERNAL_CACHE_TTL_MINS = 15;
 const RETRY_LIMIT = 2;
@@ -27,7 +27,7 @@ type RetryConfig = {
 	retryLimit: number;
 };
 
-const fetchClientWithRate = (maxRPS: any) => {
+export const fetchClientWithRate = (maxRPS: number = MAX_RPS) => {
 	const axiosInstance = axios.create({
 		httpsAgent: new Agent({
 			rejectUnauthorized: false,
@@ -44,7 +44,6 @@ const fetchClientWithRate = (maxRPS: any) => {
 	return cachedClient;
 };
 
-export const valorantAxios = fetchClientWithRate(MAX_RPS);
 export const externalAxios = setupCache(axios, {
 	ttl: 1000 * 60 * EXTERNAL_CACHE_TTL_MINS,
 });
@@ -79,11 +78,29 @@ export const injectValorantAutoRefreshToken = (
 				return new Promise(resolve =>
 					setTimeout(() => resolve(axiosInstance(retryConfig)), RETRY_DELAY_MS)
 				);
+			} else if (
+				isRetryableError(error) &&
+				config.retryCount < config.retryLimit &&
+				config.retry
+			) {
+				const retryConfig = { ...config, retryCount: config.retryCount + 1 };
+				return new Promise(resolve =>
+					setTimeout(() => resolve(axiosInstance(retryConfig)), RETRY_DELAY_MS)
+				);
 			}
+
 			return Promise.reject(error);
 		}
 	);
 };
+
+export function isRetryableError(error: AxiosError) {
+	return (
+		error.code !== "ECONNABORTED" &&
+		(!error.response ||
+			(error.response.status >= 500 && error.response.status <= 599))
+	);
+}
 
 export const injectLoggerCached = (
 	axios: AxiosCacheInstance,
