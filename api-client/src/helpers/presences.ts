@@ -63,14 +63,19 @@ export function getMyPartyPlayersPresences(
 		);
 }
 
-export function mergePresences(
-	presencesOld: Presences,
-	presencesNew: Presences
-) {
-	return [
-		...presencesOld.filter(
-			pOld => !presencesNew.find(pNew => pNew.puuid === pOld.puuid)
-		),
-		...presencesNew,
-	];
+export function mergePresences(...presenceses: Presences[]) {
+	return presenceses.reduce(
+		(mergedPresences, newPresences) => [
+			...mergedPresences.filter(
+				pOld => !newPresences.find(pNew => pNew.puuid === pOld.puuid)
+			),
+			...newPresences,
+			...mergedPresences.filter(pOld =>
+				newPresences.find(
+					pNew => pNew.puuid === pOld.puuid && pNew.time < pOld.time
+				)
+			),
+		],
+		[]
+	);
 }

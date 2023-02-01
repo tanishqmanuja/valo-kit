@@ -1,7 +1,7 @@
 import type { ApiClient } from "../api-client.js";
 import type { CompetitiveUpdatesResponse, MMR } from "../types/mmr.js";
 
-export async function getMMR(
+export async function getPlayerMMR(
 	this: ApiClient,
 	playerUUID?: string,
 	noCache?: boolean
@@ -19,8 +19,10 @@ export async function getMMR(
 	return MMR;
 }
 
-export async function getMMRs(this: ApiClient, playerUUIDs: string[]) {
-	const mmrs = await Promise.all(playerUUIDs.map(it => this.core.getMMR(it)));
+export async function getPlayerMMRs(this: ApiClient, playerUUIDs: string[]) {
+	const mmrs = await Promise.all(
+		playerUUIDs.map(it => this.core.getPlayerMMR(it))
+	);
 	return mmrs;
 }
 

@@ -5,8 +5,8 @@ import type { PreGameMatchData } from "../types/pregame.js";
 import type { Presences } from "../types/presence.js";
 import { UserInfo, UserInfoResponse } from "../types/userinfo.js";
 
-export async function getDisplayNames(this: ApiClient, playerUUIDs: string[]) {
-	const { data: DisplayNames } = await this.fetch<PlayerName[]>(
+export async function getPlayerNames(this: ApiClient, playerUUIDs: string[]) {
+	const { data: playerNames } = await this.fetch<PlayerName[]>(
 		"pd",
 		`/name-service/v2/players`,
 		{
@@ -16,7 +16,7 @@ export async function getDisplayNames(this: ApiClient, playerUUIDs: string[]) {
 		}
 	);
 
-	return DisplayNames;
+	return playerNames;
 }
 
 export async function getDisplayNamesFromPresences(
@@ -35,7 +35,7 @@ export async function getDisplayNamesFromPreGameMatchData(
 		preGameMatchData || (await this.core.getPreGameMatchData());
 
 	const playerUUIDs = _preGameMatchData.AllyTeam.Players.map(p => p.Subject);
-	const displayNames = await this.core.getDisplayNames(playerUUIDs);
+	const displayNames = await this.core.getPlayerNames(playerUUIDs);
 	return displayNames;
 }
 
@@ -47,7 +47,7 @@ export async function getDisplayNamesFromCoreGameMatchData(
 		coreGameMatchData || (await this.core.getCoreGameMatchData());
 
 	const playerUUIDs = _coreGameMatchData.Players.map(p => p.Subject);
-	const displayNames = await this.core.getDisplayNames(playerUUIDs);
+	const displayNames = await this.core.getPlayerNames(playerUUIDs);
 	return displayNames;
 }
 
