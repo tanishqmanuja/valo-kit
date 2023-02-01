@@ -68,3 +68,29 @@ export function getPlayerResultForMatch(
 		return allyTeam.won ? "Win" : "Loss";
 	}
 }
+
+export function getScoreForMatch(matchDetails: MatchDetails, puuid: string) {
+	const playerTeamId = matchDetails.players.find(
+		p => p.subject === puuid
+	)?.teamId;
+
+	if (!playerTeamId) {
+		throw new Error("Player Team Id not found");
+	}
+
+	const allyTeam = matchDetails.teams.find(
+		team => team.teamId === playerTeamId
+	);
+	const enemyTeam = matchDetails.teams.find(
+		team => team.teamId !== playerTeamId
+	);
+
+	if (!allyTeam || !enemyTeam) {
+		throw new Error("Ally team or Enemy Team not found");
+	}
+
+	return {
+		allyTeam: allyTeam.roundsWon,
+		enemyTeam: enemyTeam.roundsWon,
+	};
+}
