@@ -1,5 +1,6 @@
 import {
 	CoreGameMatchData,
+	PartyInfo,
 	PreGameMatchData,
 } from "@valo-kit/api-client/types";
 import chalk from "chalk";
@@ -20,36 +21,34 @@ export default class PlayerNamePlugin
 {
 	static id = "player-name";
 	name = "Player Name";
+	isEssential = true;
 
 	async onStateMenus() {
-		const { api, presences } = this.table.context;
+		const { partyInfo, playerNames } = this.table.context;
 
-		const players = api.helpers.getMyPartyPlayersPresences(presences);
+		const partyData = partyInfo as PartyInfo;
+		const players = partyData.Members;
 
-		const names = players.map(p => {
-			const name = `${p.game_name}#${p.game_tag}`;
+		const names = players.map(player => {
+			const playerName = playerNames!.find(p => p.Subject === player.Subject)!;
+			const name = `${playerName.GameName}#${playerName.TagLine}`;
 			return chalk.rgb(221, 224, 41)(name);
 		});
 		return () => this.table.addColumn(COLUMN_HEADER, names);
 	}
 
 	async onStatePreGame() {
-		const { api, presences, matchData } = this.table.context;
+		const { api, presences, playerNames, matchData } = this.context;
 
 		const preGameMatchData = matchData as PreGameMatchData;
 		const players = preGameMatchData.AllyTeam.Players;
-		const playersNames = await api.core.getDisplayNamesFromPreGameMatchData(
-			preGameMatchData
-		);
-
-		const myPartyplayers = api.helpers.getMyPartyPlayersPresences(presences);
 
 		const names = players.map(player => {
-			const playerName = playersNames.find(p => p.Subject === player.Subject)!;
+			const playerName = playerNames!.find(p => p.Subject === player.Subject)!;
 
 			const name = `${playerName.GameName}#${playerName.TagLine}`;
 
-			if (myPartyplayers.some(p => p.puuid === player.Subject)) {
+			if (api.helpers.isPlayerInMyParty(player.Subject, presences)) {
 				return chalk.rgb(221, 224, 41)(name);
 			}
 
@@ -64,22 +63,16 @@ export default class PlayerNamePlugin
 	}
 
 	async onStateInGame() {
-		const { api, presences, matchData } = this.table.context;
+		const { api, presences, playerNames, matchData } = this.context;
 
 		const inGameMatchData = matchData as CoreGameMatchData;
 		const players = inGameMatchData.Players;
-		const playersNames = await api.core.getDisplayNamesFromCoreGameMatchData(
-			inGameMatchData
-		);
-
-		const myPartyplayers = api.helpers.getMyPartyPlayersPresences(presences);
 
 		const names = players.map(player => {
-			const playerName = playersNames.find(p => p.Subject === player.Subject)!;
+			const playerName = playerNames!.find(p => p.Subject === player.Subject)!;
 			const name = `${playerName.GameName}#${playerName.TagLine}`;
-			const isRed = api.helpers.isInRedTeam(player.Subject, inGameMatchData);
 
-			if (myPartyplayers.some(p => p.puuid === player.Subject)) {
+			if (api.helpers.isPlayerInMyParty(player.Subject, presences)) {
 				return chalk.rgb(221, 224, 41)(name);
 			}
 
@@ -87,7 +80,7 @@ export default class PlayerNamePlugin
 				return chalk.gray("Hidden");
 			}
 
-			if (isRed) {
+			if (api.helpers.isInRedTeam(player.Subject, inGameMatchData)) {
 				return chalk.rgb(238, 77, 77)(name);
 			}
 

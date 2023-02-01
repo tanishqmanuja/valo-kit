@@ -15,7 +15,7 @@ export default class TeamSpacerPlugin
 	execPolicy: ExecPolicy = "last";
 
 	onStateInGame() {
-		const { api, matchData } = this.table.context;
+		const { api, matchData } = this.context;
 		const inGameMatchData = matchData as CoreGameMatchData;
 		const players = inGameMatchData.Players;
 

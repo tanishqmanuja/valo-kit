@@ -1,6 +1,11 @@
-import { defer, firstValueFrom, from, retry } from "rxjs";
+import { defer, firstValueFrom, from, retry, RetryConfig } from "rxjs";
 
-export function retryUntil<T>(promise: Promise<T>) {
-	const observable = defer(() => from(promise).pipe(retry({ delay: 2000 })));
+export function retryPromise<T>(
+	promise: Promise<T>,
+	retryConfig?: RetryConfig
+) {
+	const observable = defer(() =>
+		from(promise).pipe(retry({ count: 2, delay: 2000, ...retryConfig }))
+	);
 	return firstValueFrom(observable);
 }

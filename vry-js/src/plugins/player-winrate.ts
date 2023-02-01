@@ -1,5 +1,6 @@
 import {
 	CoreGameMatchData,
+	PartyInfo,
 	PreGameMatchData,
 } from "@valo-kit/api-client/types";
 import chalk from "chalk";
@@ -21,18 +22,16 @@ export default class PlayerWinRatePlugin
 	name = "Player WinRate";
 
 	async onStateMenus() {
-		const { api, presences, content } = this.table.context;
+		const { api, partyInfo, playerMMRs } = this.context;
+		const { content } = this.essentialContent;
 
 		const currentSeason = api.helpers.getCurrentSeason(content);
 
-		const players = api.helpers.getMyPartyPlayersPresences(presences);
-		const playersNames = api.helpers.getDisplayNamesFromPresences(players);
-		const playersUUIDs = api.helpers.getPlayerUUIDs(playersNames);
-
-		const playersMMR = await api.core.getMMRs(playersUUIDs);
+		const partyData = partyInfo as PartyInfo;
+		const players = partyData.Members;
 
 		const winrates = players.map(player => {
-			const mmr = playersMMR.find(mmr => mmr.Subject === player.puuid);
+			const mmr = playerMMRs!.find(mmr => mmr.Subject === player.Subject);
 			const winRateInfo = api.helpers.getCompetitiveWinRateInfo(
 				mmr!,
 				currentSeason.ID
@@ -55,18 +54,16 @@ export default class PlayerWinRatePlugin
 	}
 
 	async onStatePreGame() {
-		const { api, content, matchData } = this.table.context;
+		const { api, playerMMRs, matchData } = this.context;
+		const { content } = this.essentialContent;
 
 		const currentSeason = api.helpers.getCurrentSeason(content);
 
 		const preGameMatchData = matchData as PreGameMatchData;
 		const players = preGameMatchData.AllyTeam.Players;
-		const playersUUIDs = api.helpers.getPlayerUUIDs(players);
-
-		const playersMMR = await api.core.getMMRs(playersUUIDs);
 
 		const winrates = players.map(player => {
-			const mmr = playersMMR.find(mmr => mmr.Subject === player.Subject);
+			const mmr = playerMMRs!.find(mmr => mmr.Subject === player.Subject);
 			const winRateInfo = api.helpers.getCompetitiveWinRateInfo(
 				mmr!,
 				currentSeason.ID
@@ -89,18 +86,16 @@ export default class PlayerWinRatePlugin
 	}
 
 	async onStateInGame() {
-		const { api, content, matchData } = this.table.context;
+		const { api, playerMMRs, matchData } = this.context;
+		const { content } = this.essentialContent;
 
 		const currentSeason = api.helpers.getCurrentSeason(content);
 
 		const inGameMatchData = matchData as CoreGameMatchData;
 		const players = inGameMatchData.Players;
-		const playersUUIDs = api.helpers.getPlayerUUIDs(players);
-
-		const playersMMR = await api.core.getMMRs(playersUUIDs);
 
 		const winrates = players.map(player => {
-			const mmr = playersMMR.find(mmr => mmr.Subject === player.Subject);
+			const mmr = playerMMRs!.find(mmr => mmr.Subject === player.Subject);
 			const winRateInfo = api.helpers.getCompetitiveWinRateInfo(
 				mmr!,
 				currentSeason.ID

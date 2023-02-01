@@ -18,14 +18,17 @@ export default class PlayerAgentPlugin
 {
 	static id = "player-agent";
 	name = "Player Agent";
+	isEssential = true;
 
 	private logger = this.table.getPluginLogger(this);
 
 	async onStatePreGame() {
-		const { api, agents, matchData } = this.table.context;
+		const { api, matchData } = this.context;
+		const { agents } = this.essentialContent;
 
 		const preGameMatchData = matchData as PreGameMatchData;
 		const players = preGameMatchData.AllyTeam.Players;
+
 		const agentsList = players.map(player => {
 			const agentName = api.external.getAgentFromUUID(
 				player.CharacterID,
@@ -42,10 +45,12 @@ export default class PlayerAgentPlugin
 	}
 
 	async onStateInGame() {
-		const { api, agents, matchData } = this.table.context;
+		const { api, matchData } = this.context;
+		const { agents } = this.essentialContent;
 
 		const inGameMatchData = matchData as CoreGameMatchData;
 		const players = inGameMatchData.Players;
+
 		const agentsList = players.map(player => {
 			const agentName = api.external.getAgentFromUUID(
 				player.CharacterID,

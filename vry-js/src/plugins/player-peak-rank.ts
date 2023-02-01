@@ -1,5 +1,6 @@
 import {
 	CoreGameMatchData,
+	PartyInfo,
 	PreGameMatchData,
 } from "@valo-kit/api-client/types";
 import { formatRank, RankFormattingStyle } from "../formatters/rank.js";
@@ -39,15 +40,13 @@ export default class PlayerPeakRankPlugin
 	}
 
 	async onStateMenus() {
-		const { api, presences } = this.table.context;
-		const players = api.helpers.getMyPartyPlayersPresences(presences);
-		const playersNames = api.helpers.getDisplayNamesFromPresences(players);
-		const playersUUIDs = api.helpers.getPlayerUUIDs(playersNames);
+		const { api, partyInfo, playerMMRs } = this.context;
 
-		const playersMMR = await api.core.getMMRs(playersUUIDs);
+		const partyData = partyInfo as PartyInfo;
+		const players = partyData.Members;
 
 		const ranks = players.map(player => {
-			const mmr = playersMMR.find(mmr => mmr.Subject === player.puuid);
+			const mmr = playerMMRs!.find(mmr => mmr.Subject === player.Subject);
 			const bestTier = api.helpers.getBestCompetitiveTier(mmr!);
 			return this.formatForDisplay(bestTier);
 		});
@@ -55,15 +54,13 @@ export default class PlayerPeakRankPlugin
 	}
 
 	async onStatePreGame() {
-		const { api, matchData } = this.table.context;
+		const { api, playerMMRs, matchData } = this.context;
+
 		const preGameMatchData = matchData as PreGameMatchData;
 		const players = preGameMatchData.AllyTeam.Players;
-		const playersUUIDs = api.helpers.getPlayerUUIDs(players);
-
-		const playersMMR = await api.core.getMMRs(playersUUIDs);
 
 		const ranks = players.map(player => {
-			const mmr = playersMMR.find(mmr => mmr.Subject === player.Subject);
+			const mmr = playerMMRs!.find(mmr => mmr.Subject === player.Subject);
 			const bestTier = api.helpers.getBestCompetitiveTier(mmr!);
 			return this.formatForDisplay(bestTier);
 		});
@@ -71,15 +68,13 @@ export default class PlayerPeakRankPlugin
 	}
 
 	async onStateInGame() {
-		const { api, matchData } = this.table.context;
+		const { api, playerMMRs, matchData } = this.context;
+
 		const inGameMatchData = matchData as CoreGameMatchData;
 		const players = inGameMatchData.Players;
-		const playersUUIDs = api.helpers.getPlayerUUIDs(players);
-
-		const playersMMR = await api.core.getMMRs(playersUUIDs);
 
 		const ranks = players.map(player => {
-			const mmr = playersMMR.find(mmr => mmr.Subject === player.Subject);
+			const mmr = playerMMRs!.find(mmr => mmr.Subject === player.Subject);
 			const bestTier = api.helpers.getBestCompetitiveTier(mmr!);
 			return this.formatForDisplay(bestTier);
 		});
@@ -97,7 +92,9 @@ export default class PlayerPeakRankPlugin
 			return formatRank("Unranked", this.preferredFormattingStyle);
 		}
 
-		const { api, competitiveTiers, content } = this.table.context;
+		const { api } = this.context;
+		const { competitiveTiers, content } = this.essentialContent;
+
 		const latestCompetitiveTiers =
 			api.external.getLatestCompetitiveTiers(competitiveTiers);
 

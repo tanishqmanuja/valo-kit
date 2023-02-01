@@ -1,33 +1,30 @@
 import type { ApiClient } from "@valo-kit/api-client";
 import type {
-	Agent,
-	CompetitiveTiers,
-	Content,
 	CoreGameLoadouts,
 	CoreGameMatchData,
 	GameState,
-	Map,
+	MMR,
 	PartyInfo,
+	PlayerName,
 	PreGameLoadouts,
 	PreGameMatchData,
 	Presences,
-	Weapon,
 } from "@valo-kit/api-client/types";
 import type CliTable3 from "cli-table3";
 import type { Cell } from "cli-table3";
 import type { Logger } from "winston";
+import type { EssentialContent } from "../../helpers/content.js";
 import type { TablePlugin } from "./plugin.js";
 
 export type TableContext = {
 	api: ApiClient;
-	content: Content;
-	competitiveTiers: CompetitiveTiers[];
-	agents: Agent[];
-	weapons: Weapon[];
-	maps: Map[];
+	essentialContent: EssentialContent;
 	gameState: GameState;
 	presences: Presences;
 	partyInfo?: PartyInfo;
+	playerUUIDs?: string[];
+	playerNames?: PlayerName[];
+	playerMMRs?: MMR[];
 	matchData?: PreGameMatchData | CoreGameMatchData;
 	matchLoadouts?: PreGameLoadouts | CoreGameLoadouts;
 };

@@ -1,3 +1,5 @@
+import type { ApiClient } from "@valo-kit/api-client";
+import type { Presences, RawPresence } from "@valo-kit/api-client/types";
 import {
 	BehaviorSubject,
 	combineLatest,
@@ -19,16 +21,13 @@ import {
 	timer,
 	withLatestFrom,
 } from "rxjs";
-
-import type { ApiClient } from "@valo-kit/api-client";
-import type { Presences, RawPresence } from "@valo-kit/api-client/types";
 import type { WebSocketService } from "./websocket.js";
 
 const WS_EVENT_PRESENCES = "OnJsonApiEvent_chat_v4_presences";
 
 export class PresencesService {
 	presences$ = new BehaviorSubject<Presences>([]);
-	collectedPresences$ = new BehaviorSubject<Presences>([])
+	collectedPresences$ = new BehaviorSubject<Presences>([]);
 
 	selfPresence$ = this.presences$.pipe(
 		filter(presences => presences.some(it => it.puuid === this.api.self.puuid)),
@@ -68,9 +67,13 @@ export class PresencesService {
 
 		const collectedPresencesUpdater$ = combineLatest([
 			this.presences$,
+			this.selfPresence$,
 			this.gameState$,
 		]).pipe(
-			map(([presences, gameState]) => ({ presences, gameState })),
+			map(([presences, selfPresence, gameState]) => ({
+				presences: this.api.helpers.mergePresences([selfPresence], presences),
+				gameState,
+			})),
 			scan((pre, curr) => {
 				if (pre.gameState !== curr.gameState && curr.gameState === "MENUS") {
 					const mergedPresences = this.api.helpers.mergePresences(
@@ -83,7 +86,7 @@ export class PresencesService {
 							this.api.helpers.getMyPartyPlayersPresences(mergedPresences),
 					};
 				}
-	
+
 				return {
 					...pre,
 					gameState: curr.gameState,
@@ -96,9 +99,12 @@ export class PresencesService {
 			map(d => d.presences),
 			tap(p => this.collectedPresences$.next(p))
 		);
-	
 
-		merge(updatePresencesThroughApiOnce$, presencesUpdater$, collectedPresencesUpdater$).subscribe();
+		merge(
+			updatePresencesThroughApiOnce$,
+			presencesUpdater$,
+			collectedPresencesUpdater$
+		).subscribe();
 	}
 
 	async getGameState() {

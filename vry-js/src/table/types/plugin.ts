@@ -10,15 +10,26 @@ export abstract class TablePlugin {
 
 	abstract name: string;
 	execPolicy: ExecPolicy = "auto";
+	isEssential: boolean = false;
 
 	table: Table;
-	context: TableContext;
 	flags: string[];
 
 	constructor(table: Table, flags?: string[]) {
 		this.table = table;
-		this.context = this.table.context;
 		this.flags = flags ?? [];
+	}
+
+	get context() {
+		return this.table.context;
+	}
+
+	get api() {
+		return this.table.context.api;
+	}
+
+	get essentialContent() {
+		return this.table.context.essentialContent;
 	}
 
 	onContext?(context: TableContext): MaybePromise<TableContext>;
@@ -49,6 +60,7 @@ class SampleTablePlugin extends TablePlugin {
 
 	name = "Sample Plugin";
 	execPolicy: ExecPolicy = "auto";
+	isEssential: boolean = false;
 }
 
 export type TablePluginCtor = typeof SampleTablePlugin;

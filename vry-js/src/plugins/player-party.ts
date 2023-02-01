@@ -32,9 +32,11 @@ export default class PlayerPartyPlugin
 	name = "Player Party";
 
 	async onStatePreGame() {
-		const { api, presences, matchData } = this.table.context;
+		const { api, presences, matchData } = this.context;
+
 		const preGameMatchData = matchData as PreGameMatchData;
 		const players = preGameMatchData.AllyTeam.Players;
+
 		const partiesList = api.helpers.getParties(players, presences);
 		const parties = players.map(player => {
 			const foundParty = partiesList.find(party =>
@@ -58,10 +60,11 @@ export default class PlayerPartyPlugin
 	}
 
 	async onStateInGame() {
-		const { api, presences, matchData } = this.table.context;
+		const { api, presences, matchData } = this.context;
 
 		const inGameMatchData = matchData as CoreGameMatchData;
 		const players = inGameMatchData.Players;
+
 		const partiesList = api.helpers.getParties(players, presences);
 		const parties = players.map(player => {
 			const foundParty = partiesList.find(party =>

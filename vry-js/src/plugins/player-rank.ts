@@ -1,5 +1,6 @@
-import {
+import type {
 	CoreGameMatchData,
+	PartyInfo,
 	PreGameMatchData,
 } from "@valo-kit/api-client/types";
 import { formatRank, RankFormattingStyle } from "../formatters/rank.js";
@@ -19,6 +20,7 @@ export default class PlayerRankPlugin
 {
 	static id = "player-rank";
 	name = "Player Rank";
+	isEssential = true;
 
 	private logger = this.table.getPluginLogger(this);
 
@@ -39,20 +41,18 @@ export default class PlayerRankPlugin
 	}
 
 	async onStateMenus() {
-		const { api, presences, content, competitiveTiers } = this.table.context;
+		const { api, playerMMRs, partyInfo } = this.context;
+		const { content, competitiveTiers } = this.essentialContent;
 
 		const currentSeason = api.helpers.getCurrentSeason(content);
 		const latestCompetitiveTiers =
 			api.external.getLatestCompetitiveTiers(competitiveTiers);
 
-		const players = api.helpers.getMyPartyPlayersPresences(presences);
-		const playersNames = api.helpers.getDisplayNamesFromPresences(players);
-		const playersUUIDs = api.helpers.getPlayerUUIDs(playersNames);
-
-		const playersMMR = await api.core.getMMRs(playersUUIDs);
+		const partyData = partyInfo as PartyInfo;
+		const players = partyData.Members;
 
 		const ranks = players.map(player => {
-			const mmr = playersMMR.find(mmr => mmr.Subject === player.puuid);
+			const mmr = playerMMRs!.find(mmr => mmr.Subject === player.Subject);
 			const tier = api.helpers.getCompetitiveTier(mmr!, currentSeason);
 			const rank = api.helpers.getRankName(tier.Rank, latestCompetitiveTiers);
 			return formatRank(rank, this.preferredFormattingStyle);
@@ -61,7 +61,8 @@ export default class PlayerRankPlugin
 	}
 
 	async onStatePreGame() {
-		const { api, content, competitiveTiers, matchData } = this.table.context;
+		const { api, playerMMRs, matchData } = this.context;
+		const { content, competitiveTiers } = this.essentialContent;
 
 		const currentSeason = api.helpers.getCurrentSeason(content);
 		const latestCompetitiveTiers =
@@ -69,12 +70,9 @@ export default class PlayerRankPlugin
 
 		const preGameMatchData = matchData as PreGameMatchData;
 		const players = preGameMatchData.AllyTeam.Players;
-		const playersUUIDs = api.helpers.getPlayerUUIDs(players);
-
-		const playersMMR = await api.core.getMMRs(playersUUIDs);
 
 		const ranks = players.map(player => {
-			const mmr = playersMMR.find(mmr => mmr.Subject === player.Subject);
+			const mmr = playerMMRs!.find(mmr => mmr.Subject === player.Subject);
 			const tier = api.helpers.getCompetitiveTier(mmr!, currentSeason);
 			const rank = api.helpers.getRankName(tier.Rank, latestCompetitiveTiers);
 			return formatRank(rank, this.preferredFormattingStyle);
@@ -83,7 +81,8 @@ export default class PlayerRankPlugin
 	}
 
 	async onStateInGame() {
-		const { api, content, competitiveTiers, matchData } = this.table.context;
+		const { api, playerMMRs, matchData } = this.table.context;
+		const { content, competitiveTiers } = this.essentialContent;
 
 		const currentSeason = api.helpers.getCurrentSeason(content);
 		const latestCompetitiveTiers =
@@ -91,12 +90,9 @@ export default class PlayerRankPlugin
 
 		const inGameMatchData = matchData as CoreGameMatchData;
 		const players = inGameMatchData.Players;
-		const playersUUIDs = api.helpers.getPlayerUUIDs(players);
-
-		const playersMMR = await api.core.getMMRs(playersUUIDs);
 
 		const ranks = players.map(player => {
-			const mmr = playersMMR.find(mmr => mmr.Subject === player.Subject);
+			const mmr = playerMMRs!.find(mmr => mmr.Subject === player.Subject);
 			const tier = api.helpers.getCompetitiveTier(mmr!, currentSeason);
 			const rank = api.helpers.getRankName(tier.Rank, latestCompetitiveTiers);
 			return formatRank(rank, this.preferredFormattingStyle);

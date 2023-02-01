@@ -1,5 +1,6 @@
 import {
 	CoreGameMatchData,
+	PartyInfo,
 	PreGameMatchData,
 } from "@valo-kit/api-client/types";
 import {
@@ -19,18 +20,16 @@ export default class PlayerRankedRating
 	name = "Player RR";
 
 	async onStateMenus() {
-		const { api, content, presences } = this.table.context;
+		const { api, partyInfo, playerMMRs } = this.context;
+		const { content } = this.essentialContent;
 
 		const currentSeason = api.helpers.getCurrentSeason(content);
 
-		const players = api.helpers.getMyPartyPlayersPresences(presences);
-		const playersNames = api.helpers.getDisplayNamesFromPresences(players);
-		const playersUUIDs = api.helpers.getPlayerUUIDs(playersNames);
-
-		const playersMMR = await api.core.getMMRs(playersUUIDs);
+		const partyData = partyInfo as PartyInfo;
+		const players = partyData.Members;
 
 		const rr = players.map(player => {
-			const mmr = playersMMR.find(mmr => mmr.Subject === player.puuid);
+			const mmr = playerMMRs!.find(mmr => mmr.Subject === player.Subject);
 			const tier = api.helpers.getCompetitiveTier(mmr!, currentSeason);
 			return tier.RankedRating;
 		});
@@ -38,18 +37,16 @@ export default class PlayerRankedRating
 	}
 
 	async onStatePreGame() {
-		const { api, content, matchData } = this.table.context;
+		const { api, playerMMRs, matchData } = this.context;
+		const { content } = this.essentialContent;
 
 		const currentSeason = api.helpers.getCurrentSeason(content);
 
 		const preGameMatchData = matchData as PreGameMatchData;
 		const players = preGameMatchData.AllyTeam.Players;
-		const playersUUIDs = api.helpers.getPlayerUUIDs(players);
-
-		const playersMMR = await api.core.getMMRs(playersUUIDs);
 
 		const rr = players.map(player => {
-			const mmr = playersMMR.find(mmr => mmr.Subject === player.Subject);
+			const mmr = playerMMRs!.find(mmr => mmr.Subject === player.Subject);
 			const tier = api.helpers.getCompetitiveTier(mmr!, currentSeason);
 			return tier.RankedRating;
 		});
@@ -57,18 +54,16 @@ export default class PlayerRankedRating
 	}
 
 	async onStateInGame() {
-		const { api, content, matchData } = this.table.context;
+		const { api, playerMMRs, matchData } = this.context;
+		const { content } = this.essentialContent;
 
 		const currentSeason = api.helpers.getCurrentSeason(content);
 
 		const inGameMatchData = matchData as CoreGameMatchData;
 		const players = inGameMatchData.Players;
-		const playersUUIDs = api.helpers.getPlayerUUIDs(players);
-
-		const playersMMR = await api.core.getMMRs(playersUUIDs);
 
 		const rr = players.map(player => {
-			const mmr = playersMMR.find(mmr => mmr.Subject === player.Subject);
+			const mmr = playerMMRs!.find(mmr => mmr.Subject === player.Subject);
 			const tier = api.helpers.getCompetitiveTier(mmr!, currentSeason);
 			return tier.RankedRating;
 		});

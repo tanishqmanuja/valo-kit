@@ -2,7 +2,9 @@ import { ApiClient } from "@valo-kit/api-client";
 import type {
 	CoreGameLoadouts,
 	CoreGameMatchData,
+	MMR,
 	PartyInfo,
+	PlayerName,
 	PreGameLoadouts,
 	PreGameMatchData,
 	Presences,
@@ -43,7 +45,7 @@ import { WebSocketService } from "./services/websocket.js";
 import { Table } from "./table/table.js";
 import type { TableContext } from "./table/types/table.js";
 import { isDevelopment, isPackaged } from "./utils/env.js";
-import { retryUntil } from "./utils/helpers/rxjs.js";
+import { retryPromise } from "./utils/helpers/rxjs.js";
 
 const userTableRefreshRequest$ = new BehaviorSubject(true);
 
@@ -73,7 +75,7 @@ const main = async () => {
 
 	const ctx: TableContext = {
 		api,
-		...essentialContent,
+		essentialContent,
 		gameState: "MENUS",
 		presences: [],
 	};
@@ -107,6 +109,9 @@ const main = async () => {
 			let presences: Presences = [];
 
 			let partyInfo: PartyInfo | undefined;
+			let playerUUIDs: string[] | undefined;
+			let playerNames: PlayerName[] | undefined;
+			let playerMMRs: MMR[] | undefined;
 			let matchData: PreGameMatchData | CoreGameMatchData | undefined;
 			let matchLoadouts: PreGameLoadouts | CoreGameLoadouts | undefined;
 
@@ -114,43 +119,76 @@ const main = async () => {
 				tableSpinner.start("Getting Party Id...");
 				const partyId = await messagesService.getPartyId();
 
-				tableSpinner.start("Waiting for party presences...");
-				partyInfo = await retryUntil(api.core.getSelfPartyInfo(partyId));
-				presences = await presencesService.waitForPresencesOf(
-					api.helpers.getPlayerUUIDs(partyInfo.Members)
-				);
+				tableSpinner.start("Fetching Party Data...");
+				partyInfo = await retryPromise(api.core.getSelfPartyInfo(partyId));
+
+				playerUUIDs = api.helpers.getPlayerUUIDs(partyInfo.Members);
+
+				tableSpinner.start("Fetching Player Names...");
+				playerNames = await retryPromise(api.core.getPlayerNames(playerUUIDs));
+
+				tableSpinner.start("Fetching Player MMRs...");
+				playerMMRs = await retryPromise(api.core.getPlayerMMRs(playerUUIDs));
+
+				// tableSpinner.start("Waiting for party presences...");
+				// presences = await presencesService.waitForPresencesOf(playerUUIDs);
 			}
 
 			if (gameState === "PREGAME") {
-				tableSpinner.start("Fetching PreGame Data...");
 				const fetchUpdatedAgents = previousGameState === "PREGAME";
 
 				tableSpinner.start("Getting Match Id...");
 				const matchId = await messagesService.getPreGameMatchId();
 
-				matchData = await retryUntil(
+				tableSpinner.start("Fetching PreGame Match Data...");
+				matchData = await retryPromise(
 					api.core.getPreGameMatchData(matchId, fetchUpdatedAgents)
 				);
-				matchLoadouts = await retryUntil(api.core.getPreGameLoadouts(matchId));
+
+				tableSpinner.start("Fetching PreGame Match Loadouts...");
+				matchLoadouts = await retryPromise(
+					api.core.getPreGameLoadouts(matchId)
+				);
+
+				playerUUIDs = api.helpers.getPlayerUUIDs(matchData.AllyTeam.Players);
+
+				tableSpinner.start("Fetching Player Names...");
+				playerNames = await retryPromise(api.core.getPlayerNames(playerUUIDs));
+
+				tableSpinner.start("Fetching Player MMRs...");
+				playerMMRs = await retryPromise(api.core.getPlayerMMRs(playerUUIDs));
+
 				tableSpinner.start("Waiting for player presences...");
 				presences = await presencesService.waitForPresencesOf(
-					api.helpers.getPlayerUUIDs(matchData.AllyTeam.Players),
-					matchData.AllyTeam.Players.length * 1000
+					playerUUIDs,
+					playerUUIDs.length * 1000
 				);
 			}
-			if (gameState === "INGAME") {
-				tableSpinner.start("Fetching CoreGame Data...");
 
+			if (gameState === "INGAME") {
 				tableSpinner.start("Getting Match Id...");
 				const matchId = await messagesService.getCoreGameMatchId();
 
-				matchData = await retryUntil(api.core.getCoreGameMatchData(matchId));
-				matchLoadouts = await retryUntil(api.core.getCoreGameLoadouts(matchId));
+				tableSpinner.start("Fetching CoreGame Match Data...");
+				matchData = await retryPromise(api.core.getCoreGameMatchData(matchId));
+
+				tableSpinner.start("Fetching CoreGame Match Loadouts...");
+				matchLoadouts = await retryPromise(
+					api.core.getCoreGameLoadouts(matchId)
+				);
+
+				playerUUIDs = api.helpers.getPlayerUUIDs(matchData.Players);
+
+				tableSpinner.start("Fetching Player Names...");
+				playerNames = await retryPromise(api.core.getPlayerNames(playerUUIDs));
+
+				tableSpinner.start("Fetching Player MMRs...");
+				playerMMRs = await retryPromise(api.core.getPlayerMMRs(playerUUIDs));
 
 				tableSpinner.start("Waiting for player presences...");
 				presences = await presencesService.waitForPresencesOf(
-					api.helpers.getPlayerUUIDs(matchData.Players),
-					matchData.Players.length * 1000
+					playerUUIDs,
+					playerUUIDs.length * 1000
 				);
 			}
 
@@ -167,6 +205,9 @@ const main = async () => {
 				gameState,
 				presences,
 				partyInfo,
+				playerUUIDs,
+				playerNames,
+				playerMMRs,
 				matchData,
 				matchLoadouts,
 			});

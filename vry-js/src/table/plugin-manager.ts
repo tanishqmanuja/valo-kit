@@ -1,6 +1,7 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import { join } from "node:path/win32";
 import { cwd } from "node:process";
+import { isPromise } from "node:util/types";
 import ora from "ora";
 import { objectKeys } from "ts-extras";
 import { parse } from "yaml";
@@ -8,8 +9,7 @@ import { z } from "zod";
 import { BaseError } from "../error/base-error.js";
 import { getModuleLogger } from "../logger/logger.js";
 import { filesAccessible } from "../utils/helpers/files.js";
-import type { Table } from "./types/table.js";
-
+import { retryPromise } from "../utils/helpers/rxjs.js";
 import type {
 	OnStateInGame,
 	OnStateMenus,
@@ -17,6 +17,7 @@ import type {
 	TablePlugin,
 	TablePluginCtor,
 } from "./types/plugin.js";
+import type { Table } from "./types/table.js";
 
 const logger = getModuleLogger("Plugin Manager");
 
@@ -239,74 +240,18 @@ export class TablePluginManager
 	}
 
 	async onStateMenus() {
-		const autoPlugins = this.activatedPlugins.filter(
-			p => p.execPolicy === "auto"
-		);
-
-		const lastPlugins = this.activatedPlugins.filter(
-			p => p.execPolicy === "last"
-		);
-
-		const promises = await Promise.allSettled(
-			autoPlugins.map(plugin => plugin.onStateMenus?.())
-		);
-
-		promises.forEach((p, i) => {
-			const plugin = autoPlugins[i];
-			if (p.status === "fulfilled") {
-				p.value?.();
-			}
-			if (p.status === "rejected") {
-				logger.error(`[${plugin.name}][OnStateMenu] ${p.reason}`);
-			}
-		});
-
-		for (let plugin of lastPlugins) {
-			if (plugin.onStateMenus) {
-				try {
-					await plugin.onStateMenus();
-				} catch (e) {
-					logger.error(`[${plugin.name}][OnStateMenu] ${e}`);
-				}
-			}
-		}
+		return this.onState("Menus");
 	}
 
 	async onStatePreGame() {
-		const autoPlugins = this.activatedPlugins.filter(
-			p => p.execPolicy === "auto"
-		);
-
-		const lastPlugins = this.activatedPlugins.filter(
-			p => p.execPolicy === "last"
-		);
-
-		const promises = await Promise.allSettled(
-			autoPlugins.map(plugin => plugin.onStatePreGame?.())
-		);
-
-		promises.forEach((p, i) => {
-			const plugin = autoPlugins[i];
-			if (p.status === "fulfilled") {
-				p.value?.();
-			}
-			if (p.status === "rejected") {
-				logger.error(`[${plugin.name}][OnStatePreGame] ${p.reason}`);
-			}
-		});
-
-		for (let plugin of lastPlugins) {
-			if (plugin.onStatePreGame) {
-				try {
-					await plugin.onStatePreGame();
-				} catch (e) {
-					logger.error(`[${plugin.name}][OnStatePreGame] ${e}`);
-				}
-			}
-		}
+		return this.onState("PreGame");
 	}
 
 	async onStateInGame() {
+		return this.onState("InGame");
+	}
+
+	private async onState(state: "Menus" | "PreGame" | "InGame") {
 		const autoPlugins = this.activatedPlugins.filter(
 			p => p.execPolicy === "auto"
 		);
@@ -316,7 +261,21 @@ export class TablePluginManager
 		);
 
 		const promises = await Promise.allSettled(
-			autoPlugins.map(plugin => plugin.onStateInGame?.())
+			autoPlugins.map(plugin => {
+				if (
+					plugin.isEssential &&
+					plugin[`onState${state}`] &&
+					isPromise(plugin[`onState${state}`]?.())
+				) {
+					type promisedStateReturn = Awaited<
+						ReturnType<NonNullable<typeof plugin[`onState${typeof state}`]>>
+					>;
+					return retryPromise(
+						plugin[`onState${state}`]?.() as Promise<promisedStateReturn>
+					);
+				}
+				return plugin[`onState${state}`]?.();
+			})
 		);
 
 		promises.forEach((p, i) => {
@@ -325,16 +284,16 @@ export class TablePluginManager
 				p.value?.();
 			}
 			if (p.status === "rejected") {
-				logger.error(`[${plugin.name}][OnStateInGame] ${p.reason}`);
+				logger.error(`[${plugin.name}][OnState${state}] ${p.reason}`);
 			}
 		});
 
 		for (let plugin of lastPlugins) {
-			if (plugin.onStateInGame) {
+			if (plugin[`onState${state}`]) {
 				try {
-					await plugin.onStateInGame();
+					await plugin[`onState${state}`]?.();
 				} catch (e) {
-					logger.error(`[${plugin.name}][OnStateInGame] ${e}`);
+					logger.error(`[${plugin.name}][OnState${state}] ${e}`);
 				}
 			}
 		}

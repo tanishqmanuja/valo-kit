@@ -40,7 +40,7 @@ export default class PlayerWeaponsPlugin
 	}
 
 	async onStatePreGame() {
-		const { matchLoadouts } = this.table.context;
+		const { matchLoadouts } = this.context;
 		const preGameLoadouts = matchLoadouts as PreGameLoadouts;
 
 		if (!preGameLoadouts.LoadoutsValid) {
@@ -67,7 +67,7 @@ export default class PlayerWeaponsPlugin
 	}
 
 	async onStateInGame() {
-		const { matchLoadouts } = this.table.context;
+		const { matchLoadouts } = this.context;
 		const inGameLoadouts = matchLoadouts as CoreGameLoadouts;
 
 		const skins = inGameLoadouts?.Loadouts.map(l =>
@@ -90,7 +90,7 @@ export default class PlayerWeaponsPlugin
 	}
 
 	private getMappedLoadout(loadout: Loadout) {
-		const { weapons } = this.table.context;
+		const { weapons } = this.essentialContent;
 		return getMappedLoadout(loadout, weapons);
 	}
 }
