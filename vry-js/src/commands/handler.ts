@@ -1,10 +1,13 @@
 import type { ApiClient } from "@valo-kit/api-client";
 import { objectKeys } from "ts-extras";
+import { getModuleLogger } from "../logger/logger.js";
 import { pingCommandHandler } from "./ping.js";
 import { skinCommandHandler } from "./skin.js";
 import type { Command, CommandContext, CommandHandlerFn } from "./types.js";
 
 const MSG_PREFIX = "[vRY]";
+
+const logger = getModuleLogger("Command Handler");
 
 export class CommandManager {
 	private commandHandlers: Record<string, CommandHandlerFn> = {};
@@ -23,12 +26,18 @@ export class CommandManager {
 			it => it === command.name
 		);
 		if (handlerName) {
-			const res = await this.commandHandlers[handlerName](command, context);
-			if (res) {
-				await this.api.core.postChatMessage(
-					command.cid,
-					`${MSG_PREFIX} ${res}`,
-					"groupchat"
+			try {
+				const res = await this.commandHandlers[handlerName](command, context);
+				if (res) {
+					await this.api.core.postChatMessage(
+						command.cid,
+						`${MSG_PREFIX} ${res}`,
+						"groupchat"
+					);
+				}
+			} catch {
+				logger.error(
+					`Failed for command ${handlerName} with params ${command.params}`
 				);
 			}
 		}
