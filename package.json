@@ -28,6 +28,6 @@
   "license": "MIT",
   "devDependencies": {
     "rimraf": "^3.0.2",
-    "turbo": "^1.7.0"
+    "turbo": "^1.7.2"
   }
 }
