@@ -20,7 +20,11 @@
 		"clean": {
 			"cache": false
 		},
-		"lint": {},
+		"lint": {
+			"dependsOn": [
+				"^build"
+			]
+		},
 		"package": {
 			"dependsOn": [
 				"build"
