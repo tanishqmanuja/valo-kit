@@ -21,7 +21,8 @@ export function skinCommandHandler(command: Command, context: CommandContext) {
 		return "Invalid weapon name";
 	}
 
-	const { api, agents, gameState, matchData, matchLoadouts, weapons } = context;
+	const { api, gameState, matchData, matchLoadouts } = context;
+	const { agents, weapons } = context.essentialContent;
 	const inGameLoadouts = matchLoadouts as CoreGameLoadouts;
 
 	if (gameState !== "INGAME") {
