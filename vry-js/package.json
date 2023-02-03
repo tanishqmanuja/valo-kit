@@ -25,6 +25,7 @@
   "license": "MIT",
   "devDependencies": {
     "@release-it/conventional-changelog": "^5.1.1",
+    "@types/discord-rpc": "^4.0.3",
     "@types/fs-extra": "^11.0.1",
     "@types/minimist": "^1.2.2",
     "@types/node": "^18.11.18",
@@ -46,6 +47,7 @@
     "@valo-kit/api-client": "workspace:*",
     "chalk": "^5.2.0",
     "cli-table3": "^0.6.3",
+    "discord-rpc": "^4.0.1",
     "execa": "^6.1.0",
     "keypress": "^0.2.1",
     "lowdb": "^5.0.5",
