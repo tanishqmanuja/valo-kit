@@ -48,22 +48,8 @@ export default class PlayerMatchesPlugin
 		const partyData = partyInfo as PartyInfo;
 		const players = partyData.Members;
 
-		const matchesResults = await Promise.all(
-			players.map(p => this.getHistory(p.Subject))
-		);
-		const results = matchesResults.map(
-			it =>
-				it
-					.map(r => {
-						if (it.length === 1 && r?.result && r.score) {
-							return `${formatMatchResult(r.result)} (${r.score.allyTeam}:${
-								r.score.enemyTeam
-							})`;
-						}
-						return formatMatchResult(r?.result);
-					})
-					.join(chalk.gray(" • ")) || chalk.gray(" • ")
-		);
+		const results = await this.getResults(players);
+
 		return () => this.table.addColumn(this.getColumnHeader(), results);
 	}
 
@@ -73,22 +59,8 @@ export default class PlayerMatchesPlugin
 		const preGameMatchData = matchData as PreGameMatchData;
 		const players = preGameMatchData.AllyTeam.Players;
 
-		const matchesResults = await Promise.all(
-			players.map(p => this.getHistory(p.Subject))
-		);
-		const results = matchesResults.map(
-			it =>
-				it
-					.map(r => {
-						if (it.length === 1 && r?.result && r.score) {
-							return `${formatMatchResult(r.result)} (${r.score.allyTeam}:${
-								r.score.enemyTeam
-							})`;
-						}
-						return formatMatchResult(r?.result);
-					})
-					.join(chalk.gray(" • ")) || chalk.gray(" • ")
-		);
+		const results = await this.getResults(players);
+
 		return () => this.table.addColumn(this.getColumnHeader(), results);
 	}
 
@@ -98,6 +70,19 @@ export default class PlayerMatchesPlugin
 		const inGameMatchData = matchData as CoreGameMatchData;
 		const players = inGameMatchData.Players;
 
+		const results = await this.getResults(players);
+
+		return () => this.table.addColumn(this.getColumnHeader(), results);
+	}
+
+	private getColumnHeader() {
+		if (this.numMatches === 1) {
+			return "Prev Match";
+		}
+		return "Prev Matches";
+	}
+
+	private async getResults(players: { Subject: string }[]) {
 		const matchesResults = await Promise.all(
 			players.map(p => this.getHistory(p.Subject))
 		);
@@ -114,14 +99,8 @@ export default class PlayerMatchesPlugin
 					})
 					.join(chalk.gray(" • ")) || chalk.gray(" • ")
 		);
-		return () => this.table.addColumn(this.getColumnHeader(), results);
-	}
 
-	private getColumnHeader() {
-		if (this.numMatches === 1) {
-			return "Prev Match";
-		}
-		return "Prev Matches";
+		return results;
 	}
 
 	private async getHistory(puuid: string) {
