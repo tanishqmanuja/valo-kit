@@ -15,7 +15,6 @@ import {
 	BehaviorSubject,
 	bufferCount,
 	combineLatest,
-	interval,
 	map,
 	merge,
 	retry,
@@ -275,15 +274,7 @@ const main = async () => {
 		})
 	);
 
-	const discordRPCUpdater$ = merge(
-		presencesService.gameState$,
-		interval(15 * 1000)
-	).pipe(
-		tap(async () => await discordRPCService.updateActivity()),
-		retry({ delay: 2000 })
-	);
-
-	merge(tableGenerator$, commandHandler$, discordRPCUpdater$).subscribe();
+	merge(tableGenerator$, commandHandler$).subscribe();
 };
 
 try {

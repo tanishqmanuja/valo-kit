@@ -1,15 +1,26 @@
 import { ApiClient } from "@valo-kit/api-client";
 import { GameState } from "@valo-kit/api-client/types";
-import DiscordRPC from "discord-rpc";
-import { BehaviorSubject, filter, firstValueFrom } from "rxjs";
+import DiscordRPC, { AutoClient } from "discord-auto-rpc";
+import {
+	BehaviorSubject,
+	filter,
+	merge,
+	retry,
+	skipUntil,
+	tap,
+	timer,
+} from "rxjs";
 import { getQueueName } from "../formatters/queue.js";
 import { EssentialContent } from "../helpers/content.js";
+import { getModuleLogger } from "../logger/logger.js";
 import { PresencesService } from "./presences.js";
 
 const CLIENT_ID = "1070992075128057886";
 
+const logger = getModuleLogger("Discord RPC Service");
+
 export class DiscordRPCService {
-	private client: DiscordRPC.Client;
+	private client: DiscordRPC.AutoClient;
 	private isReady$ = new BehaviorSubject(false);
 
 	private baseActivity: DiscordRPC.Presence = {
@@ -27,18 +38,34 @@ export class DiscordRPCService {
 		private presencesService: PresencesService,
 		private content: EssentialContent
 	) {
-		this.client = new DiscordRPC.Client({ transport: "ipc" });
+		this.client = new AutoClient({ transport: "ipc" });
 
-		this.client.on("ready", async () => {
+		this.client.once("ready", async () => {
 			this.isReady$.next(true);
 		});
 
-		this.client.login({ clientId: CLIENT_ID });
+		this.client.endlessLogin({ clientId: CLIENT_ID });
+
+		const discordRPCUpdater$ = merge(
+			presencesService.gameState$,
+			timer(0, 15 * 1000)
+		).pipe(
+			skipUntil(this.isReady$.pipe(filter(Boolean))),
+			tap(async () => {
+				await this.updateActivity();
+			}),
+			retry({
+				delay: err => {
+					logger.error(err);
+					return timer(2000);
+				},
+			})
+		);
+
+		discordRPCUpdater$.subscribe();
 	}
 
 	async updateActivity() {
-		await firstValueFrom(this.isReady$.pipe(filter(Boolean)));
-
 		const gameStateDisplayName: Record<GameState, string> = {
 			MENUS: "In-Menus",
 			PREGAME: "Agent Select",
