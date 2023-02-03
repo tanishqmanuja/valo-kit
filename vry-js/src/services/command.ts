@@ -12,7 +12,8 @@ export class CommandService {
 				const from = msg.puuid;
 
 				const commandRegex = /^!(?<name>\w+)(?: (?<params>.*))?$/gm;
-				const { name, params } = commandRegex.exec(msg.body)?.groups ?? {};
+				const { name, params } =
+					commandRegex.exec(msg.body.toLowerCase())?.groups ?? {};
 
 				if (!name) {
 					return undefined;
