@@ -15,6 +15,7 @@ import {
 	BehaviorSubject,
 	bufferCount,
 	combineLatest,
+	interval,
 	map,
 	merge,
 	retry,
@@ -39,6 +40,7 @@ import { waitForLogin } from "./helpers/valorant.js";
 import { apiLogger, getModuleLogger } from "./logger/logger.js";
 import { ChatService } from "./services/chat.js";
 import { CommandService } from "./services/command.js";
+import { DiscordRPCService } from "./services/discord-rpc.js";
 import { MessagesService } from "./services/messages.js";
 import { PresencesService } from "./services/presences.js";
 import { WebSocketService } from "./services/websocket.js";
@@ -72,6 +74,11 @@ const main = async () => {
 	const commandService = new CommandService(chatService);
 
 	const essentialContent = await fetchEssentialContent(api);
+	const discordRPCService = new DiscordRPCService(
+		api,
+		presencesService,
+		essentialContent
+	);
 
 	const ctx: TableContext = {
 		api,
@@ -268,7 +275,15 @@ const main = async () => {
 		})
 	);
 
-	merge(tableGenerator$, commandHandler$).subscribe();
+	const discordRPCUpdater$ = merge(
+		presencesService.gameState$,
+		interval(15 * 1000)
+	).pipe(
+		tap(async () => await discordRPCService.updateActivity()),
+		retry({ delay: 2000 })
+	);
+
+	merge(tableGenerator$, commandHandler$, discordRPCUpdater$).subscribe();
 };
 
 try {
