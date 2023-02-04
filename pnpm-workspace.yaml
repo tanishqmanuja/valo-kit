@@ -1,3 +1,4 @@
 packages:
   - "vry-js"
   - "api-client"
+  - "discord-rpc-assets"
