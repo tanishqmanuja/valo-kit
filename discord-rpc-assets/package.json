@@ -3,6 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "all": "pnpm agents && pnpm ranks && pnpm maps && pnpm modes",
     "agents": "node src/agents.js",
     "ranks": "node src/ranks.js",
     "maps": "node src/maps.js",

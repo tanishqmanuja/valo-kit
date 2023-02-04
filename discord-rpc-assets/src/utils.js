@@ -4,6 +4,7 @@ import { Agent } from "node:https";
 import { dirname, join } from "node:path";
 import { cwd } from "node:process";
 import { pipeline } from "node:stream/promises";
+import sharp from "sharp";
 
 const httpsAgent = new Agent({ rejectUnauthorized: false });
 
@@ -25,4 +26,11 @@ export const downloadFile = async (fileUrl, savePath) => {
 	} catch (err) {
 		throw new Error(err);
 	}
+};
+
+export const resizeToSquare = async path => {
+	const buffer = await sharp(path)
+		.resize({ width: 512, height: 512, fit: "cover" })
+		.toBuffer();
+	return sharp(buffer).toFile(path);
 };

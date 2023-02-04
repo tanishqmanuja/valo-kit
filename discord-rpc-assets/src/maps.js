@@ -1,15 +1,7 @@
 import axios from "axios";
-import sharp from "sharp";
-import { downloadFile } from "./utils.js";
+import { downloadFile, resizeToSquare } from "./utils.js";
 
 const MAPS_URL = "https://valorant-api.com/v1/maps";
-
-const resizeToSquare = async path => {
-	const buffer = await sharp(path)
-		.resize({ width: 512, height: 512, fit: "cover" })
-		.toBuffer();
-	return sharp(buffer).toFile(path);
-};
 
 try {
 	const {
