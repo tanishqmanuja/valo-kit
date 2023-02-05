@@ -40,7 +40,7 @@ export const getMaps = async () => {
 	return maps;
 };
 
-export const getMapFromMapUrl = async (mapUrl: string, maps: Map[]) => {
+export const getMapFromMapUrl = (mapUrl: string, maps: Map[]) => {
 	return maps.find(m => m.mapUrl === mapUrl);
 };
 
