@@ -1,3 +1,5 @@
+import { LooseAutoComplete } from "./shared.js";
+
 export type RawPresence = {
 	actor: string;
 	basic: string;
@@ -31,8 +33,8 @@ export type PrivatePresence = {
 	partyOwnerMatchCurrentTeam: string;
 	partyOwnerMatchScoreAllyTeam: number;
 	partyOwnerMatchScoreEnemyTeam: number;
-	partyOwnerProvisioningFlow: string;
-	provisioningFlow: string;
+	partyOwnerProvisioningFlow: ProvisioningFlow;
+	provisioningFlow: ProvisioningFlow;
 	matchMap: string;
 	partyId: string;
 	isPartyOwner: boolean;
@@ -60,4 +62,7 @@ export type Presence = RawPresence & { private: PrivatePresence };
 export type Presences = Presence[];
 
 export type GameState = "MENUS" | "PREGAME" | "INGAME";
-export type PartyState = "MATCHMAKING" | "MATCHMADE_GAME_STARTING" | "DEFAULT";
+export type PartyState = LooseAutoComplete<
+	"MATCHMAKING" | "MATCHMADE_GAME_STARTING" | "CUSTOM_GAME_SETUP" | "DEFAULT"
+>;
+export type ProvisioningFlow = LooseAutoComplete<"CustomGame" | "INVALID">;
