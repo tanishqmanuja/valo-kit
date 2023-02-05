@@ -18,14 +18,18 @@ export const getTableHeader = async (
 		const server = gamepods[matchData.GamePodID];
 		const selfPresence = api.helpers.getSelfPresence(presences);
 		const queueName = getQueueName(selfPresence.private.queueId);
-		const mapName = (
-			await api.external.getMapFromMapUrl(selfPresence.private.matchMap, maps)
+		const mapName = api.external.getMapFromMapUrl(
+			selfPresence.private.matchMap,
+			maps
 		)?.displayName;
 		if (queueName && mapName && gameState === "INGAME") {
 			header = `${colorizeGameState(
 				gameState
 			)} - ${queueName} - ${mapName} [${server}]`;
-		} else if (queueName) {
+		} else if (
+			queueName &&
+			selfPresence.private.provisioningFlow !== "INVALID"
+		) {
 			header = `${colorizeGameState(gameState)} - ${queueName} [${server}]`;
 		} else {
 			header = `${colorizeGameState(gameState)} - ${server}`;

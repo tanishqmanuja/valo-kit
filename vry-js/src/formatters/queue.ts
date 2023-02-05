@@ -1,6 +1,6 @@
-import { objectHasOwn } from "ts-extras";
+import { capitalizeFirstLetter } from "../utils/helpers/text.js";
 
-export const queueNameLUT = {
+export const queueNameLUT: Record<string, string> = {
 	newmap: "New Map",
 	competitive: "Competitive",
 	unrated: "Unrated",
@@ -10,11 +10,10 @@ export const queueNameLUT = {
 	onefa: "Replication",
 	custom: "Custom",
 	snowball: "Snowball Fight",
+	swiftplay: "Swift Play",
 	"": "Custom",
 };
 
 export const getQueueName = (queueId: string) => {
-	if (objectHasOwn(queueNameLUT, queueId)) {
-		return queueNameLUT[queueId];
-	}
+	return queueNameLUT[queueId] ?? capitalizeFirstLetter(queueId);
 };
