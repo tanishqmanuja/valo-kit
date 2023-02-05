@@ -1,10 +1,17 @@
 import { ApiClient } from "@valo-kit/api-client";
-import { GameState } from "@valo-kit/api-client/types";
+import {
+	CoreGameMatchData,
+	GameState,
+	MMR,
+	PreGameMatchData,
+} from "@valo-kit/api-client/types";
 import DiscordRPC, { AutoClient } from "discord-auto-rpc";
 import {
 	BehaviorSubject,
 	filter,
+	firstValueFrom,
 	merge,
+	ReplaySubject,
 	retry,
 	skipUntil,
 	tap,
@@ -15,16 +22,31 @@ import { EssentialContent } from "../helpers/content.js";
 import { getModuleLogger } from "../logger/logger.js";
 import { PresencesService } from "./presences.js";
 
+export type RPCContext = {
+	previousGameState: GameState;
+	gameState: GameState;
+	essentialContent: EssentialContent;
+	playerMMR: MMR;
+	matchData?: PreGameMatchData | CoreGameMatchData;
+};
+
 const CLIENT_ID = "1070992075128057886";
+const FALLBACK_LARGE_IMAGE_KEY = "vry";
 
 const logger = getModuleLogger("Discord RPC Service");
+
+const valTimeParser = (time: string) => {
+	const [d, t] = time.split("-");
+	return Date.parse(`${d.replace(".", "-")}T${t.replace(".", ":")}`);
+};
 
 export class DiscordRPCService {
 	private client: DiscordRPC.AutoClient;
 	private isReady$ = new BehaviorSubject(false);
+	private context$ = new ReplaySubject<RPCContext>(1);
 
 	private baseActivity: DiscordRPC.Presence = {
-		largeImageKey: "vry",
+		largeImageKey: FALLBACK_LARGE_IMAGE_KEY,
 		buttons: [
 			{
 				label: "What's This? 👀",
@@ -33,10 +55,11 @@ export class DiscordRPCService {
 		],
 	};
 
+	private lastActivity: DiscordRPC.Presence = {};
+
 	constructor(
 		private api: ApiClient,
-		private presencesService: PresencesService,
-		private content: EssentialContent
+		private presencesService: PresencesService
 	) {
 		this.client = new AutoClient({ transport: "ipc" });
 
@@ -65,48 +88,147 @@ export class DiscordRPCService {
 		discordRPCUpdater$.subscribe();
 	}
 
-	async updateActivity() {
-		const gameStateDisplayName: Record<GameState, string> = {
-			MENUS: "In-Menus",
-			PREGAME: "Agent Select",
-			INGAME: "In-Game",
-		};
+	async updateContext(context: RPCContext) {
+		this.context$.next({ ...context });
+	}
 
-		const gameState = await this.presencesService.getGameState();
+	async updateActivity() {
+		const activity: DiscordRPC.Presence = {};
+
+		const ctx = await firstValueFrom(this.context$);
 		const selfPresence = await this.presencesService.getSelfPresence();
 
-		const mapName = (
-			await this.api.external.getMapFromMapUrl(
-				selfPresence.private.matchMap,
-				this.content.maps
-			)
-		)?.displayName;
+		const gameState = ctx.gameState;
+		const content = ctx.essentialContent;
 
-		const queueName = getQueueName(selfPresence.private.queueId);
+		if (gameState === "MENUS") {
+			const currentSeason = this.api.helpers.getCurrentSeason(content.content);
+			const latestCompetitiveTiers =
+				this.api.external.getLatestCompetitiveTiers(content.competitiveTiers);
 
-		let details;
+			const tier = this.api.helpers.getCompetitiveTier(
+				ctx.playerMMR,
+				currentSeason
+			);
+			const rankName = this.api.helpers.getRankName(
+				tier.Rank,
+				latestCompetitiveTiers
+			);
 
-		if (gameState === "INGAME") {
-			if (queueName) {
-				details = `${queueName}`;
-			}
+			activity.smallImageText = rankName;
+			activity.smallImageKey = `rank_${rankName
+				.toLowerCase()
+				.replace(/\s/, "")}`;
 
-			if (details && mapName) {
-				details += " " + mapName;
-			}
+			activity.largeImageKey = "valorant";
+			activity.largeImageText = "Valorant";
 
-			const score = `${selfPresence.private.partyOwnerMatchScoreAllyTeam}:${selfPresence.private.partyOwnerMatchScoreEnemyTeam}`;
-			if (details && score) {
-				details += " " + `// ${score}`;
+			activity.partyId = selfPresence.private.partyId;
+			activity.partySize = selfPresence.private.partySize;
+			activity.partyMax = selfPresence.private.maxPartySize;
+			activity.startTimestamp = new Date(selfPresence.private.partyVersion);
+
+			if (selfPresence.private.partyState === "MATCHMAKING") {
+				activity.state = "In Queue";
+				activity.state += " " + getQueueName(selfPresence.private.queueId);
+				const timeStamp = valTimeParser(selfPresence.private.queueEntryTime);
+
+				if (!isNaN(timeStamp)) {
+					activity.startTimestamp = timeStamp;
+				}
+			} else {
+				if (selfPresence.private.partyState === "CUSTOM_GAME_SETUP") {
+					activity.details = "Setting Up Custom Game";
+				}
+				activity.state = "In Lobby";
 			}
 		}
 
-		this.client.setActivity({
+		if (gameState === "PREGAME") {
+			const matchData = ctx.matchData as PreGameMatchData;
+			const queueName = getQueueName(selfPresence.private.queueId);
+			const modeKey = queueName.toLowerCase().replace(/\s/, "");
+
+			activity.details = queueName;
+			activity.largeImageText = queueName;
+
+			const availableIcons = [
+				"deathmatch",
+				"escalation",
+				"replication",
+				"snowballfight",
+				"spikerush",
+				"standard",
+				"swiftplay",
+			];
+			if (selfPresence.private.provisioningFlow !== "INVALID") {
+				if (availableIcons.includes(modeKey)) {
+					activity.largeImageKey = `mode_${modeKey}`;
+				} else {
+					activity.largeImageKey = "mode_standard";
+				}
+			}
+
+			activity.partyId = selfPresence.private.partyId;
+			activity.partySize = selfPresence.private.partySize;
+			activity.partyMax = selfPresence.private.maxPartySize;
+			activity.state = "Agent Select";
+			activity.endTimestamp = new Date(
+				matchData.Version + matchData.PhaseTimeRemainingNS / 1e6
+			);
+		}
+
+		if (gameState === "INGAME") {
+			const mapName = this.api.external.getMapFromMapUrl(
+				selfPresence.private.matchMap,
+				content.maps
+			)?.displayName;
+
+			if (mapName) {
+				activity.largeImageText = mapName;
+				activity.largeImageKey = `map_${mapName.toLowerCase()}`;
+			}
+
+			const matchData = ctx.matchData as CoreGameMatchData;
+			const characterId = matchData.Players.find(
+				p => p.Subject === this.api.self.puuid
+			)?.CharacterID;
+			const agentName = this.api.external.getAgentFromUUID(
+				characterId!,
+				content.agents
+			)?.displayName;
+
+			if (agentName) {
+				activity.smallImageText = agentName;
+				activity.smallImageKey = `agent_${agentName
+					.toLowerCase()
+					.replace(/\//, "")}`;
+			}
+
+			activity.partyId = selfPresence.private.partyId;
+			activity.partySize = selfPresence.private.partySize;
+			activity.partyMax = selfPresence.private.maxPartySize;
+			activity.state = "In Game";
+			activity.details = getQueueName(selfPresence.private.queueId);
+
+			const score = `${selfPresence.private.partyOwnerMatchScoreAllyTeam} - ${selfPresence.private.partyOwnerMatchScoreEnemyTeam}`;
+			if (score) {
+				activity.details += " " + "//" + " " + score;
+			}
+
+			activity.startTimestamp = new Date(matchData.Version);
+		}
+
+		try {
+			this.client.setActivity({
+				...this.baseActivity,
+				...activity,
+			});
+		} catch {}
+
+		this.lastActivity = {
 			...this.baseActivity,
-			details,
-			state: gameStateDisplayName[gameState],
-			partySize: selfPresence.private.partySize,
-			partyMax: selfPresence.private.maxPartySize,
-		});
+			...activity,
+		};
 	}
 }

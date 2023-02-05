@@ -73,11 +73,7 @@ const main = async () => {
 	const commandService = new CommandService(chatService);
 
 	const essentialContent = await fetchEssentialContent(api);
-	const discordRPCService = new DiscordRPCService(
-		api,
-		presencesService,
-		essentialContent
-	);
+	const discordRPCService = new DiscordRPCService(api, presencesService);
 
 	const ctx: TableContext = {
 		api,
@@ -216,6 +212,14 @@ const main = async () => {
 				playerMMRs,
 				matchData,
 				matchLoadouts,
+			});
+
+			await discordRPCService.updateContext({
+				essentialContent,
+				previousGameState,
+				gameState,
+				matchData,
+				playerMMR: playerMMRs?.find(p => p.Subject === api.self.puuid)!,
 			});
 
 			await table.applyStateLifecycles();
