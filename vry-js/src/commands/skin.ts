@@ -23,14 +23,15 @@ export function skinCommandHandler(command: Command, context: CommandContext) {
 
 	const { api, gameState, matchData, matchLoadouts } = context;
 	const { agents, weapons } = context.essentialContent;
-	const inGameLoadouts = matchLoadouts as CoreGameLoadouts;
 
 	if (gameState !== "INGAME") {
 		return "Command only valid when in-game";
 	}
 
+	const inGameLoadouts = matchLoadouts as CoreGameLoadouts;
 	const inGameMatchData = matchData as CoreGameMatchData;
 	const players = inGameMatchData.Players;
+
 	const myTeamId = players.find(p => p.Subject === api.self.puuid)?.TeamID;
 	const agentsList = players.map(player => {
 		const agentName = api.external.getAgentFromUUID(

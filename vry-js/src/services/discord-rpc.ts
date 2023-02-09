@@ -1,4 +1,3 @@
-import { ApiClient } from "@valo-kit/api-client";
 import {
 	CoreGameMatchData,
 	GameState,
@@ -20,6 +19,7 @@ import {
 import { getQueueName } from "../formatters/queue.js";
 import { EssentialContent } from "../helpers/content.js";
 import { getModuleLogger } from "../logger/logger.js";
+import { ApiService } from "./api.js";
 import { PresencesService } from "./presences.js";
 
 export type RPCContext = {
@@ -58,7 +58,7 @@ export class DiscordRPCService {
 	private lastActivity: DiscordRPC.Presence = {};
 
 	constructor(
-		private api: ApiClient,
+		private apiService: ApiService,
 		private presencesService: PresencesService
 	) {
 		this.client = new AutoClient({ transport: "ipc" });
@@ -86,6 +86,10 @@ export class DiscordRPCService {
 		);
 
 		discordRPCUpdater$.subscribe();
+	}
+
+	get api() {
+		return this.apiService.api;
 	}
 
 	async updateContext(context: RPCContext) {

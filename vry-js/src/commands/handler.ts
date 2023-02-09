@@ -1,6 +1,8 @@
 import type { ApiClient } from "@valo-kit/api-client";
 import { objectKeys } from "ts-extras";
 import { getModuleLogger } from "../logger/logger.js";
+import { isDevelopment, isPackaged } from "../utils/env.js";
+import { InfoCommandHandler } from "./info.js";
 import { pingCommandHandler } from "./ping.js";
 import { skinCommandHandler } from "./skin.js";
 import type { Command, CommandContext, CommandHandlerFn } from "./types.js";
@@ -15,6 +17,7 @@ export class CommandManager {
 	constructor(private api: ApiClient) {
 		this.use("ping", pingCommandHandler);
 		this.use("skin", skinCommandHandler);
+		this.use("info", InfoCommandHandler);
 	}
 
 	use(name: string, fn: CommandHandlerFn) {
@@ -35,10 +38,18 @@ export class CommandManager {
 						"groupchat"
 					);
 				}
-			} catch {
+			} catch (e) {
 				logger.error(
 					`Failed for command ${handlerName} with params ${command.params}`
 				);
+				await this.api.core.postChatMessage(
+					command.cid,
+					"Command failed",
+					"groupchat"
+				);
+				if (isDevelopment() && !isPackaged()) {
+					console.log(e);
+				}
 			}
 		}
 	}

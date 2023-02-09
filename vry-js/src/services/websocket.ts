@@ -1,11 +1,10 @@
-import { ApiClient } from "@valo-kit/api-client";
 import ora from "ora";
 import { filter, Subject, tap } from "rxjs";
 import { WebSocketSubject } from "rxjs/webSocket";
-import { waitForLogin } from "../helpers/valorant.js";
 import { getModuleLogger } from "../logger/logger.js";
 import type { ValorantWebSocketEvent } from "../utils/websocket.js";
 import { generateValorantWebSocketSubject } from "../utils/websocket.js";
+import { ApiService } from "./api.js";
 
 const logger = getModuleLogger("WebSocket Service");
 
@@ -15,8 +14,12 @@ export class WebSocketService {
 
 	webSocketEvents$ = new Subject<ValorantWebSocketEvent>();
 
-	constructor(private api: ApiClient) {
+	constructor(private apiService: ApiService) {
 		this.connect();
+	}
+
+	get api() {
+		return this.apiService.api;
 	}
 
 	enableListenerForEvent(event: string) {
@@ -42,7 +45,7 @@ export class WebSocketService {
 						ora().warn("WebSocket Disconnected (is VALORANT running?)\n");
 						logger.error(e);
 
-						await waitForLogin(this.api);
+						await this.apiService.waitForLogin();
 						this.connect();
 					},
 				})

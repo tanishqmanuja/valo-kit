@@ -1,10 +1,7 @@
 import chalk from "chalk";
 import ora from "ora";
-import { BehaviorSubject } from "rxjs";
 
-export const enableHotkeyDetector = (
-	userTableRefreshRequest$: BehaviorSubject<boolean>
-) => {
+export const enableHotkeyDetector = (refreshFn: () => void) => {
 	var keypress = require("keypress");
 	keypress(process.stdin);
 
@@ -15,7 +12,7 @@ export const enableHotkeyDetector = (
 			ora().info(
 				chalk.gray("Table Refresh Requested (might take upto 15 secs)")
 			);
-			userTableRefreshRequest$.next(true);
+			refreshFn();
 		}
 
 		if (key && key.ctrl && key.name == "c") {

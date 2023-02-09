@@ -1,4 +1,3 @@
-import { ApiClient } from "@valo-kit/api-client";
 import {
 	defer,
 	distinctUntilChanged,
@@ -11,6 +10,7 @@ import {
 	retry,
 	tap,
 } from "rxjs";
+import { ApiService } from "./api.js";
 
 import type { WebSocketService } from "./websocket.js";
 
@@ -26,7 +26,7 @@ export class MessagesService {
 	matchId$ = new ReplaySubject<MatchIdEvent>(1);
 
 	constructor(
-		private api: ApiClient,
+		private apiService: ApiService,
 		private webSocketService: WebSocketService
 	) {
 		this.webSocketService.enableListenerForEvent(WS_EVENT_MESSAGES);
@@ -69,6 +69,10 @@ export class MessagesService {
 		);
 
 		merge(partyIdUpdater$, matchIdUpdater$).subscribe();
+	}
+
+	get api() {
+		return this.apiService.api;
 	}
 
 	async getPartyId() {

@@ -3,10 +3,10 @@ import { Command } from "../commands/types.js";
 import { ChatService } from "./chat.js";
 
 export class CommandService {
-	commands$: Observable<Command>;
+	command$: Observable<Command>;
 
 	constructor(private chatService: ChatService) {
-		this.commands$ = this.chatService.partyMessages$.pipe(
+		this.command$ = this.chatService.partyMessages$.pipe(
 			filter(msg => msg.body.startsWith("!")),
 			map(msg => {
 				const from = msg.puuid;
@@ -23,6 +23,7 @@ export class CommandService {
 					from,
 					name,
 					params: params?.split(/\s/) ?? [],
+					paramsRaw: params,
 				};
 				return cmd;
 			}),

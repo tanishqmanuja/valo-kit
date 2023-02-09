@@ -6,6 +6,7 @@ export type Command = {
 	from: string;
 	name: string;
 	params: string[];
+	paramsRaw: string;
 };
 
 export type CommandContext = TableContext;

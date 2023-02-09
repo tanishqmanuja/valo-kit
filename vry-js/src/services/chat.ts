@@ -1,4 +1,3 @@
-import type { ApiClient } from "@valo-kit/api-client";
 import {
 	concatAll,
 	debounceTime,
@@ -7,6 +6,7 @@ import {
 	map,
 	Observable,
 } from "rxjs";
+import { ApiService } from "./api.js";
 import type { WebSocketService } from "./websocket.js";
 
 export type Message = {
@@ -33,7 +33,7 @@ export class ChatService {
 	coreGameMessages$: Observable<Message>;
 
 	constructor(
-		private api: ApiClient,
+		private apiService: ApiService,
 		private webSocketService: WebSocketService
 	) {
 		this.webSocketService.enableListenerForEvent(WS_EVENT_CHAT_MESSAGES);

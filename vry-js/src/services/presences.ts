@@ -1,4 +1,3 @@
-import type { ApiClient } from "@valo-kit/api-client";
 import type { Presences, RawPresence } from "@valo-kit/api-client/types";
 import {
 	BehaviorSubject,
@@ -11,16 +10,16 @@ import {
 	interval,
 	map,
 	merge,
-	mergeMap,
 	retry,
 	scan,
 	shareReplay,
 	switchMap,
 	take,
 	tap,
-	timer,
+	timeout,
 	withLatestFrom,
 } from "rxjs";
+import { ApiService } from "./api.js";
 import type { WebSocketService } from "./websocket.js";
 
 const WS_EVENT_PRESENCES = "OnJsonApiEvent_chat_v4_presences";
@@ -41,13 +40,13 @@ export class PresencesService {
 	);
 
 	constructor(
-		private api: ApiClient,
+		private apiService: ApiService,
 		private webSocketService: WebSocketService
 	) {
 		this.webSocketService.enableListenerForEvent(WS_EVENT_PRESENCES);
 
 		const updatePresencesThroughApiOnce$ = defer(() =>
-			from(api.core.getPresences())
+			from(apiService.api.core.getPresences())
 		).pipe(
 			tap(p => this.presences$.next(p)),
 			retry({ count: 5, delay: 2000 }),
@@ -107,6 +106,10 @@ export class PresencesService {
 		).subscribe();
 	}
 
+	get api() {
+		return this.apiService.api;
+	}
+
 	async getGameState() {
 		return firstValueFrom(this.gameState$);
 	}
@@ -122,7 +125,7 @@ export class PresencesService {
 		);
 	}
 
-	async waitForPresencesOf(playersUUIDs: string[], timeout = 5000) {
+	async waitForPresencesOf(playersUUIDs: string[], timeoutMs = 5000) {
 		const presencesApi$ = defer(() =>
 			from(this.api.core.getPresences()).pipe(retry({ delay: 2000 }))
 		);
@@ -138,14 +141,13 @@ export class PresencesService {
 				playersUUIDs.every(puuid =>
 					presences.find(presence => presence.puuid === puuid)
 				)
-			)
+			),
+			timeout({
+				first: timeoutMs,
+				with: () => this.collectedPresences$,
+			})
 		);
 
-		return firstValueFrom(
-			merge(
-				collectedPresences$,
-				timer(timeout).pipe(mergeMap(() => this.collectedPresences$))
-			)
-		);
+		return firstValueFrom(collectedPresences$);
 	}
 }
