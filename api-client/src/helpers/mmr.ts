@@ -67,7 +67,7 @@ export function getWinRate(mmr: MMR, seasonId?: string) {
 	Object.values(mmr.QueueSkills).forEach(queue => {
 		Object.values(queue.SeasonalInfoBySeasonID).forEach(season => {
 			if (!seasonId || season.SeasonID === seasonId) {
-				totalWins += season.NumberOfWins;
+				totalWins += season.NumberOfWinsWithPlacements;
 				totalGames += season.NumberOfGames;
 			}
 		});
@@ -93,7 +93,7 @@ export function getCompetitiveWinRateInfo(mmr: MMR, seasonId?: string) {
 
 	Object.values(competitiveQueue.SeasonalInfoBySeasonID).forEach(season => {
 		if (!seasonId || season.SeasonID === seasonId) {
-			totalWins += season.NumberOfWins;
+			totalWins += season.NumberOfWinsWithPlacements;
 			totalGames += season.NumberOfGames;
 		}
 	});
