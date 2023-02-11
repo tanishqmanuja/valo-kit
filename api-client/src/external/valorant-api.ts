@@ -62,10 +62,25 @@ export const getCompetitiveTiers = async (): Promise<CompetitiveTiers[]> => {
 	return tiers;
 };
 
+export const getEpisodeNumberFromAssetObjectName = (
+	assetObjectName: string
+) => {
+	const [part] = assetObjectName.split("_");
+	const episodeNum = part.replace("Episode", "");
+	return parseInt(episodeNum, 10) || 0;
+};
+
 export const getLatestCompetitiveTiers = (
 	competitiveTiers: CompetitiveTiers[]
 ) => {
-	const { tiers } = competitiveTiers[competitiveTiers.length - 1] ?? {};
+	const { tiers } =
+		competitiveTiers
+			.sort(
+				({ assetObjectName: a }, { assetObjectName: b }) =>
+					getEpisodeNumberFromAssetObjectName(a) -
+					getEpisodeNumberFromAssetObjectName(b)
+			)
+			.at(-1) ?? {};
 	return tiers;
 };
 
