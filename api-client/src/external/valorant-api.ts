@@ -81,6 +81,9 @@ export const getLatestCompetitiveTiers = (
 					getEpisodeNumberFromAssetObjectName(b)
 			)
 			.at(-1) ?? {};
+	if (!tiers) {
+		throw new Error("Unable to find Latest Competitive Tiers");
+	}
 	return tiers;
 };
 
