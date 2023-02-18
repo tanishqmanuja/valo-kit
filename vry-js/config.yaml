@@ -1,3 +1,5 @@
+features:
+  discord-rpc: true
 plugins:
   player-party: true
   player-agent: true

@@ -17,6 +17,7 @@ import {
 	timer,
 } from "rxjs";
 import { getQueueName } from "../formatters/queue.js";
+import { Config } from "../helpers/config.js";
 import { EssentialContent } from "../helpers/content.js";
 import { getModuleLogger } from "../logger/logger.js";
 import { ApiService } from "./api.js";
@@ -55,9 +56,8 @@ export class DiscordRPCService {
 		],
 	};
 
-	private lastActivity: DiscordRPC.Presence = {};
-
 	constructor(
+		private config: Config,
 		private apiService: ApiService,
 		private presencesService: PresencesService
 	) {
@@ -67,7 +67,9 @@ export class DiscordRPCService {
 			this.isReady$.next(true);
 		});
 
-		this.client.endlessLogin({ clientId: CLIENT_ID });
+		if (config.features["discord_rpc"]) {
+			this.client.endlessLogin({ clientId: CLIENT_ID });
+		}
 
 		const discordRPCUpdater$ = merge(
 			presencesService.gameState$,
@@ -88,7 +90,7 @@ export class DiscordRPCService {
 		discordRPCUpdater$.subscribe();
 	}
 
-	get api() {
+	private get api() {
 		return this.apiService.api;
 	}
 
@@ -97,6 +99,10 @@ export class DiscordRPCService {
 	}
 
 	async updateActivity() {
+		if (!this.config.features["discord_rpc"]) {
+			return;
+		}
+
 		const activity: DiscordRPC.Presence = {};
 
 		const ctx = await firstValueFrom(this.context$);
@@ -229,10 +235,5 @@ export class DiscordRPCService {
 				...activity,
 			});
 		} catch {}
-
-		this.lastActivity = {
-			...this.baseActivity,
-			...activity,
-		};
 	}
 }

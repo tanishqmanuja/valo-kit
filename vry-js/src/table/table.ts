@@ -62,7 +62,7 @@ export class Table implements ITable {
 
 	async initPlugins() {
 		this.pluginManager.registerInternalPlugins(...pluginCtors);
-		const res = await this.pluginManager.loadPluginsFromFile("./plugins.yaml");
+		const res = await this.pluginManager.loadPluginsFromFile("./config.yaml");
 		if (!res) {
 			for (const plugin of pluginCtors) {
 				this.pluginManager.activatePlugin(plugin.id, undefined, true);

@@ -27,7 +27,7 @@ const pluginsSchema = z.record(
 );
 
 const PluginsConfig = z.object({
-	dir: z.string().optional(),
+	plugins_dir: z.string().optional(),
 	plugins: pluginsSchema,
 });
 
@@ -154,17 +154,17 @@ export class TablePluginManager
 			return false;
 		}
 
-		if (config.dir) {
-			this.registerPluginsFromDir(config.dir, config.plugins);
+		if (config.plugins_dir) {
+			this.registerPluginsFromDir(config.plugins_dir, config.plugins);
 		}
 
 		for (const pluginId of objectKeys(config.plugins)) {
 			const flags = config.plugins[pluginId];
 			if (flags) {
 				if (flags instanceof Array) {
-					this.activatePlugin(pluginId, flags, !config.dir);
+					this.activatePlugin(pluginId, flags, !config.plugins_dir);
 				} else {
-					this.activatePlugin(pluginId, [], !config.dir);
+					this.activatePlugin(pluginId, [], !config.plugins_dir);
 				}
 			}
 		}
@@ -199,7 +199,7 @@ export class TablePluginManager
 	}
 
 	private async registerPluginsFromDir(
-		dir: NonNullable<PluginsConfig["dir"]>,
+		dir: NonNullable<PluginsConfig["plugins_dir"]>,
 		plugins: PluginsConfig["plugins"]
 	) {
 		const absoluteDirPath = join(cwd(), dir);

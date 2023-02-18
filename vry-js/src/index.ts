@@ -8,6 +8,7 @@ import {
 	printStartingBanner,
 	setTitle,
 } from "./helpers/banner.js";
+import { getConfig } from "./helpers/config.js";
 import { fetchEssentialContent } from "./helpers/content.js";
 import { enableHotkeyDetector } from "./helpers/hotkeys.js";
 import { getTableHeader } from "./helpers/table.js";
@@ -36,6 +37,8 @@ const errorHandler = new ErrorHandler(logger);
 const main = async () => {
 	const spinnerService = new SpinnerService();
 
+	const config = await getConfig("./config.yaml");
+
 	const apiService = new ApiService();
 	await apiService.waitForLogin();
 
@@ -54,7 +57,11 @@ const main = async () => {
 
 	const chatService = new ChatService(apiService, webSocketService);
 	const commandService = new CommandService(chatService);
-	const discordRPCService = new DiscordRPCService(apiService, presencesService);
+	const discordRPCService = new DiscordRPCService(
+		config,
+		apiService,
+		presencesService
+	);
 
 	const essentialContent = await fetchEssentialContent(api);
 
