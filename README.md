@@ -6,19 +6,17 @@
 [![License][license-shield]][license-url]
 
 [build-status-shield]: https://img.shields.io/github/actions/workflow/status/tanishqmanuja/valo-kit/workspace.yaml?branch=main&style=for-the-badge
-
 [downloads-shield]: https://img.shields.io/github/downloads/tanishqmanuja/valo-kit/total?style=for-the-badge&logo=github
 [downloads-url]: https://github.com/tanishqmanuja/valo-kit/releases/latest
-
 [language-shield]: https://img.shields.io/github/languages/top/tanishqmanuja/valo-kit?style=for-the-badge
 [language-url]: https://www.typescriptlang.org/
-
 [license-shield]: https://img.shields.io/github/license/tanishqmanuja/valo-kit?style=for-the-badge
 [license-url]: https://github.com/tanishqmanuja/valo-kit/blob/main/LICENSE.md
 
 A monorepo build using pnpm and turborepo, which encapsulates multiple interdependent projects for valorant.
 
 ## Contents
+
 1. [vRYjs](#vryjs)
 2. [Api Client](#api-client)
 3. [Acknowledgements](#infinite-thanks-%EF%B8%8F)
@@ -29,18 +27,24 @@ A monorepo build using pnpm and turborepo, which encapsulates multiple interdepe
 This is port/rewrite of the OG project [VALORANT Rank Yoinker](https://github.com/zayKenyon/VALORANT-rank-yoinker) which is originally written in python.
 
 ### Preview
+
 ![vRYjs Table](https://raw.github.com/tanishqmanuja/valo-kit/main/assets/vRYjsTable.png?maxAge=2592000)
 
 ### Usage for Noobs (Basic)
+
 1. Download vRYjs.exe from [releases](https://github.com/tanishqmanuja/valo-kit/releases/)
 2. Put in a separate folder because software generates temporary helper folder and files.
 3. Run and Enjoy!
 
 ### Usage for Techies (Intermediate)
+
 1. All steps from `Usage for Noobs`
-2. Download file `plugins.yaml` from [here](https://github.com/tanishqmanuja/valo-kit/blob/main/vry-js/plugins.yaml)
-3. Place `plugins.yaml` in the same folder as vRYjs.exe
+2. Download file `config.yaml` from [here](https://github.com/tanishqmanuja/valo-kit/blob/main/vry-js/config.yaml)
+3. Place `config.yaml` in the same folder as vRYjs.exe
 4. Use your creativity to customize the file using the guide below.
+
+> config.yaml was called plugins.yaml for vRYjs version 0.6.1 and below.
+
 ```yaml
 # Disable a plugin
 # Example: sort-by-level: false
@@ -61,10 +65,13 @@ plugin-name: [flag1, flag2, flag3]
 ```
 
 ### Usage for Gods (Advance)
+
 Prerequisites
+
 - node >=18.12
 
 Running from source
+
 1. Clone the repo
 
 ```shell
@@ -110,14 +117,17 @@ Do this if you want to make your own executable file
 ```shell
 pnpm package
 ```
-> The file will be located at __./vry-js/bin/vRYjs-{version}.exe__
+
+> The file will be located at **./vry-js/bin/vRYjs-{version}.exe**
 
 ### Notes
+
 1. AntiVirus Programs\
-Some antivirus vendors mark .exe file generated using `@vercel/pkg` as trojan. This is a false positive.
-Still if you dont trust the executable provided in release, you can build your own or run from the source.
+   Some antivirus vendors mark .exe file generated using `@vercel/pkg` as trojan. This is a false positive.
+   Still if you dont trust the executable provided in release, you can build your own or run from the source.
 
 Reference Issues:
+
 - https://github.com/vercel/pkg/issues/1540
 
 ## Api Client
