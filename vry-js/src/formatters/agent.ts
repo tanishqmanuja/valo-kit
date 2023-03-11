@@ -23,6 +23,7 @@ export const agentColorLUT: Record<string, RGBTuple> = {
 	Chamber: [200, 200, 200],
 	Fade: [92, 92, 94],
 	Harbor: [16, 200, 205],
+	Gekko: [153, 204, 4],
 };
 
 export const colorizeAgent = (agent: string) => {
