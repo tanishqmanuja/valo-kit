@@ -34,6 +34,10 @@ export const getTableHeader = async (
 		} else {
 			header = `${colorizeGameState(gameState)} - ${server}`;
 		}
+
+		if(gameState === "PREGAME" && "AllyTeam" in matchData) {
+			header += ` //${matchData.AllyTeam.TeamID === "Blue" ? "Defense" : "Attack"}`;
+		}
 	} else {
 		header = `${colorizeGameState(gameState)}`;
 	}
