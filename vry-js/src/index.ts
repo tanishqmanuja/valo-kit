@@ -25,6 +25,7 @@ import { WebSocketService } from "./services/websocket.js";
 import { Table } from "./table/table.js";
 import type { TableContext } from "./table/types/table.js";
 import { isDevelopment, isPackaged } from "./utils/env.js";
+import { keypress } from "./utils/helpers/keypress.js";
 
 setTitle();
 printStartingBanner();
@@ -175,11 +176,12 @@ try {
 	errorHandler.handleError(e);
 }
 
-process.on("uncaughtException", e => {
+process.on("uncaughtException", async e => {
 	if (isDevelopment() && !isPackaged()) {
 		console.log(e);
 	}
 	logger.error(e);
 	console.log(chalk.red("✖ Unknown error occured!, Please check the logs."));
+	await keypress()
 	process.exit(1);
 });
