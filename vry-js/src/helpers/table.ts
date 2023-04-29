@@ -23,8 +23,6 @@ export const getTableHeader = async (
 
 		const mapId = matchData.MapID ?? selfPresence.private.matchMap
 		const mapName = api.external.getMapFromMapUrl(mapId, maps)?.displayName
-
-		console.log(mapName,queueName,gameState);
 		
 		if (queueName && mapName && (gameState === "INGAME" || gameState === "PREGAME")) {
 			header = `${colorizeGameState(
