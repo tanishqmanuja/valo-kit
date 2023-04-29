@@ -1,4 +1,9 @@
 {
 	"extends": "../tsconfig.base.json",
+	"compilerOptions": {
+		"paths": {
+			"@valo-kit/api-client":[ "../api-client/src/index.ts"]
+		}
+	},
 	"include": ["src"]
 }
