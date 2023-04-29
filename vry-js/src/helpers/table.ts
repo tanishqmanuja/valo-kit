@@ -17,14 +17,12 @@ export const getTableHeader = async (
 	if (matchData) {
 		const server = gamepods[matchData.GamePodID];
 		const selfPresence = api.helpers.getSelfPresence(presences);
-		const queueName = getQueueName(selfPresence.private.queueId);
-		const mapName = api.external.getMapFromMapUrl(
-			selfPresence.private.matchMap,
-			maps
-		)?.displayName ?? api.external.getMapFromMapUrl(
-			matchData.MapID,
-			maps
-		)?.displayName;
+		
+		const queueId = "QueueID" in matchData ? matchData.QueueID : selfPresence.private.queueId
+		const queueName = getQueueName(queueId) ;
+
+		const mapId = matchData.MapID ?? selfPresence.private.matchMap
+		const mapName = api.external.getMapFromMapUrl(mapId, maps)?.displayName
 
 		console.log(mapName,queueName,gameState);
 		
