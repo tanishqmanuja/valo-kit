@@ -27,7 +27,7 @@ export const getTableHeader = async (
 		if (queueName && mapName && (gameState === "INGAME" || gameState === "PREGAME")) {
 			header = `${colorizeGameState(
 				gameState
-			)} - ${queueName} ${mapName} [${server}]`;
+			)} - ${mapName} (${queueName}) [${server}]`;
 		} else if (
 			queueName &&
 			selfPresence.private.provisioningFlow !== "INVALID"
