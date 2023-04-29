@@ -21,11 +21,17 @@ export const getTableHeader = async (
 		const mapName = api.external.getMapFromMapUrl(
 			selfPresence.private.matchMap,
 			maps
+		)?.displayName ?? api.external.getMapFromMapUrl(
+			matchData.MapID,
+			maps
 		)?.displayName;
-		if (queueName && mapName && gameState === "INGAME") {
+
+		console.log(mapName,queueName,gameState);
+		
+		if (queueName && mapName && (gameState === "INGAME" || gameState === "PREGAME")) {
 			header = `${colorizeGameState(
 				gameState
-			)} - ${queueName} - ${mapName} [${server}]`;
+			)} - ${queueName} ${mapName} [${server}]`;
 		} else if (
 			queueName &&
 			selfPresence.private.provisioningFlow !== "INVALID"
