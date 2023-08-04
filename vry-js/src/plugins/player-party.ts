@@ -8,6 +8,7 @@ import {
 	OnStatePreGame,
 	TablePlugin,
 } from "../table/types/plugin.js";
+import { stripAnsiCodes } from "../utils/helpers/text.js";
 
 const selfPartySymbol = "*";
 const selfPartyIcon = chalk.rgb(221, 224, 41)(selfPartySymbol);
@@ -54,7 +55,7 @@ export default class PlayerPartyPlugin
 			return partyIcons[foundParty.partyNumber];
 		});
 
-		if (parties.some(p => p !== "")) {
+		if (parties.some(p => stripAnsiCodes(p) === partySymbol)) {
 			return () => this.table.addColumn(COLUMN_HEADER, parties);
 		}
 	}
@@ -82,7 +83,7 @@ export default class PlayerPartyPlugin
 			return partyIcons[foundParty.partyNumber];
 		});
 
-		if (parties.some(p => p !== "")) {
+		if (parties.some(p => stripAnsiCodes(p) === partySymbol)) {
 			return () => this.table.addColumn(COLUMN_HEADER, parties);
 		}
 	}

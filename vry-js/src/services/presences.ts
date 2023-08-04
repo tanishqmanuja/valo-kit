@@ -127,7 +127,7 @@ export class PresencesService {
 
 	async waitForPresencesOf(playersUUIDs: string[], timeoutMs = 5000) {
 		const presencesApi$ = defer(() =>
-			from(this.api.core.getPresences()).pipe(retry({ delay: 2000 }))
+			from(this.api.core.getPresences()).pipe(retry({ count: 3, delay: 2000 }))
 		);
 
 		const presencesUpdater$ = interval(2000).pipe(
