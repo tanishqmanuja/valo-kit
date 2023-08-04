@@ -56,7 +56,10 @@ export default class PlayerNamePlugin
 				return chalk.gray("Hidden");
 			}
 
-			return chalk.rgb(76, 151, 237)(name);
+			return (
+				chalk.rgb(76, 151, 237)(name) +
+				chalk.dim(player.PlayerIdentity.Incognito ? "(H)" : "")
+			);
 		});
 
 		return () => this.table.addColumn(COLUMN_HEADER, names);
@@ -81,10 +84,16 @@ export default class PlayerNamePlugin
 			}
 
 			if (api.helpers.isInRedTeam(player.Subject, inGameMatchData)) {
-				return chalk.rgb(238, 77, 77)(name);
+				return (
+					chalk.rgb(238, 77, 77)(name) +
+					chalk.dim(player.PlayerIdentity.Incognito ? "(H)" : "")
+				);
 			}
 
-			return chalk.rgb(76, 151, 237)(name);
+			return (
+				chalk.rgb(76, 151, 237)(name) +
+				chalk.dim(player.PlayerIdentity.Incognito ? "(H)" : "")
+			);
 		});
 
 		return () => this.table.addColumn(COLUMN_HEADER, names);
