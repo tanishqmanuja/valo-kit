@@ -9,7 +9,7 @@ import {
 	TablePlugin,
 } from "../table/types/plugin.js";
 
-const selfPartySymbol = "●";
+const selfPartySymbol = "*";
 const selfPartyIcon = chalk.rgb(221, 224, 41)(selfPartySymbol);
 const partySymbol = "■";
 const partyIcons = [
