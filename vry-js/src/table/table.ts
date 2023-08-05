@@ -163,6 +163,12 @@ export class Table implements ITable {
 				content: chalk.bold(h),
 				hAlign: "center",
 			})) as any,
+			chars: {
+				"top-left": "╭",
+				"top-right": "╮",
+				"bottom-left": "╰",
+				"bottom-right": "╯",
+			},
 			style: {
 				compact: true,
 				head: [],
