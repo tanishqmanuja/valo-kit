@@ -192,10 +192,11 @@ export class GameDataService {
 			this.api.core.getPlayerMMRs(playerUUIDs)
 		);
 
-		this.spinner.start("Waiting for Self Presence");
-		const presences = await this.presencesService.waitForPresencesOf([
-			this.api.self.puuid,
-		]);
+		this.spinner.start("Waiting for Player Presences...");
+		const presences = await this.presencesService.waitForPresencesOf(
+			playerUUIDs,
+			playerUUIDs.length * 1000
+		);
 
 		return {
 			matchId,
@@ -236,10 +237,11 @@ export class GameDataService {
 			this.api.core.getPlayerMMRs(playerUUIDs)
 		);
 
-		this.spinner.start("Waiting for Self Presence");
-		const presences = await this.presencesService.waitForPresencesOf([
-			this.api.self.puuid,
-		]);
+		this.spinner.start("Waiting for Player Presences...");
+		const presences = await this.presencesService.waitForPresencesOf(
+			playerUUIDs,
+			playerUUIDs.length * 1000
+		);
 
 		return {
 			matchId,
