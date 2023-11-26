@@ -7,8 +7,8 @@ import type {
 } from "@valo-kit/api-client/types";
 import chalk from "chalk";
 import {
-	getMappedLoadout,
 	WeaponName,
+	getMappedLoadout,
 	weaponsList,
 } from "../formatters/loadouts.js";
 import { getSkinColorFromTier } from "../formatters/weapon.js";
@@ -44,14 +44,16 @@ export default class PlayerWeaponsPlugin
 	}
 
 	async onStatePreGame() {
-		const { matchLoadouts } = this.context;
+		const { matchLoadouts, playerUUIDs } = this.context;
 		const preGameLoadouts = matchLoadouts as PreGameLoadouts;
 
 		if (!preGameLoadouts.LoadoutsValid) {
 			return;
 		}
 
-		const cols = this.getSkinsColumnsForDisplay(preGameLoadouts.Loadouts);
+		const cols = this.getSkinsColumnsForDisplay(
+			preGameLoadouts.Loadouts.slice(0, playerUUIDs?.length ?? 0)
+		);
 
 		return () =>
 			cols.forEach((c, i) => this.table.addColumn(this.preferredWeapons[i], c));
@@ -84,9 +86,15 @@ export default class PlayerWeaponsPlugin
 						const regex = new RegExp(prefWeapon, "ig");
 						const name = skin.displayName.replace(regex, "").trim();
 						const colorRGB = getSkinColorFromTier(skin.contentTierUuid!);
+
+						if (name === "Random Favorite Skin") {
+							return chalk.rgb(...colorRGB)("Randomized");
+						}
+
 						if (name.toLowerCase() === "standard") {
 							return chalk.gray(name);
 						}
+
 						return chalk.rgb(...colorRGB)(name);
 					});
 
