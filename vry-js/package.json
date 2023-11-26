@@ -4,6 +4,9 @@
   "private": true,
   "description": "CLI for Valorant Match Info",
   "type": "module",
+  "bin": {
+    "vryjs": "dist/index.cjs"
+  },
   "scripts": {
     "start": "node dist/index.cjs",
     "start:dev": "pnpm build:dev && pnpm start",
