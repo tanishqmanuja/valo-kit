@@ -4,6 +4,7 @@ import type {
 	CoreGameLoadouts,
 	Loadout,
 	PreGameLoadouts,
+	PreGameMatchData,
 } from "@valo-kit/api-client/types";
 import chalk from "chalk";
 import {
@@ -44,15 +45,21 @@ export default class PlayerWeaponsPlugin
 	}
 
 	async onStatePreGame() {
-		const { matchLoadouts, playerUUIDs } = this.context;
+		const { matchLoadouts, playerUUIDs, matchData } = this.context;
 		const preGameLoadouts = matchLoadouts as PreGameLoadouts;
+		const preGameMatchData = matchData as PreGameMatchData;
 
 		if (!preGameLoadouts.LoadoutsValid) {
 			return;
 		}
 
+		const slices =
+			preGameMatchData.AllyTeam.TeamID === "Blue"
+				? [0, playerUUIDs?.length ?? 0]
+				: [playerUUIDs?.length ?? 0 * -1];
+
 		const cols = this.getSkinsColumnsForDisplay(
-			preGameLoadouts.Loadouts.slice(0, playerUUIDs?.length ?? 0)
+			preGameLoadouts.Loadouts.slice(...slices)
 		);
 
 		return () =>
