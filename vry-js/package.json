@@ -1,6 +1,6 @@
 {
   "name": "@valo-kit/vry-js",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "private": true,
   "description": "CLI for Valorant Match Info",
   "type": "module",
